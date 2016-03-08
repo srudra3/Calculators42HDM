@@ -6,7 +6,17 @@ import linecache
 
 class Calc2HDM:
     def __init__(self, mode = 'H', sqrts = 13000,  muR = 0.5, muF = 0.5, type = 2, tb = 1, m12 = 0, mh = 125, mH = 350, mA = 400, mhc = 420, sba = 0.99, outputFile = "out.dat"):
-        self.mode = mode
+
+        # 11 = light Higgs (h), 12 = heavy Higgs (H), 21 = pseudoscalar (A)
+        if mode == 'h' :
+            self.mode = 11
+        elif mode == 'H' :
+            self.mode = 12
+        elif mode == 'A' :
+            self.mode = 21
+        else :
+            print "Wrong mode selected! Please, use h, H or A." 
+
         self.tb = tb
         self.m12 = m12
         self.m12_2 = m12*m12
@@ -50,12 +60,12 @@ class Calc2HDM:
 
     def getXsecFromSusHi(self) :
      
-        sushiDefaultCardPath = "default_cards/default_sushi_8TeV.in"
+        sushiDefaultCardPath = "default_cards/default_sushi.in"
         sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+".in"
         sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+".out"
      
         # Replacements of variables into the input file
-        replacements = {'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF)}
+        replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts)}
         sushiDefaultCard = open(sushiDefaultCardPath)
         sushiInputCard = open(sushiInputCardPath, 'w')
         for line in sushiDefaultCard:
