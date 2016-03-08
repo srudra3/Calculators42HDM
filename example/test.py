@@ -26,4 +26,6 @@ print "ZZ BR", test.HtoZZBR
 print "xsec : ",  test.getXsecFromSusHi()
 
 
-
+test.setmA(200)
+test.computeBR()
+print "ZZ BR", test.HtoZZBR

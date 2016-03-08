@@ -58,6 +58,9 @@ class Calc2HDM:
         self.AtoggBR = 0
 
 
+    def setmA(self, M) :
+        self.mA = M
+
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
