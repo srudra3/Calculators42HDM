@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 mode = 'H'
 sqrts = 13000
 type = 2
-tb = 1.5
+tb = 1
 m12 = 0
 mh = 125
-mH = 500
+mH = 300
 mA = 50
 mhc = mH
 
