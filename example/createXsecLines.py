@@ -35,8 +35,8 @@ def ScanPlane(mHinit,mHend,mAinit,mAend,tag, tb, muR=0.5, muF=0.5) :
            test.computeBR()  
            Xsec_Gr2D.SetPoint(n,mA,mH,1000*xsec*test.HtoZABR*test.AtobbBR*0.067) 
            mA+=5
-           n+=5
-        mH+=2 
+           n+=1
+        mH+=5 
     Xsec_Gr2D.Write()
 
 def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
