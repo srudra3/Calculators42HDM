@@ -1,17 +1,19 @@
 #!/usr/bin/python
 
-
+import sys
 import math
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
 from ROOT import *
 
 def ScanPlane(mHinit,mHend,mAinit,mAend,tag, tb, muR=0.5, muF=0.5) :
     mH=mHinit
-    Xsec_Gr2D = TGraph2D(1000)
-    Xsec_Gr2D.SetName("Xsec_Scan_"+tag)
+    nIterParAxis=50
+    binsizeX=(mAend-mAinit)/(nIterParAxis-1)
+    binsizeY=(mHend-mHinit)/(nIterParAxis-1)
+    Xsec_TH2F = TH2F("h","h",nIterParAxis,mAinit-binsizeX/2,mAend+binsizeX/2,nIterParAxis,mHinit-binsizeY/2,mHend+binsizeY/2)
+    Xsec_TH2F.SetName("Xsec_Scan_"+tag)
     n=0
     while mH < mHend:
-        print "mH is ",mH
         mA=mAinit
         test.setmH(mH)
         test.setmHc(mH)
@@ -23,21 +25,13 @@ def ScanPlane(mHinit,mHend,mAinit,mAend,tag, tb, muR=0.5, muF=0.5) :
         test.setmA(mAinit)
         xsec =  test.getXsecFromSusHi()
         while mA < test.mH-90:
-           print "--> mA is ",mA
-           test.setmH(mH)
-           test.setmHc(mH)
-           test.settb(tb)
-           test.setm12(math.sqrt(test.mhc*test.mhc*test.tb/(1+test.tb)))
-           test.setm122(mH*mH*tb/(1+tb))
-           test.setmuR(muR)
-           test.setmuF(muF)
            test.setmA(mA) 
            test.computeBR()  
-           Xsec_Gr2D.SetPoint(n,mA,mH,1000*xsec*test.HtoZABR*test.AtobbBR*0.067) 
-           mA+=5
+           Xsec_TH2F.Fill(mA,mH,1000*xsec*test.HtoZABR*test.AtobbBR*0.067) 
+           mA+=binsizeX
            n+=1
-        mH+=5 
-    Xsec_Gr2D.Write()
+        mH+=binsizeY 
+    Xsec_TH2F.Write()
 
 def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
  
@@ -71,7 +65,7 @@ def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
 mode = 'H'
 sqrts = 13000
 type = 2
-tb = 1
+tb = 1.5
 m12 = 0
 mh = 125
 mH = 300
