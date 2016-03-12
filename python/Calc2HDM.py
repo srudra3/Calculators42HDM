@@ -61,11 +61,32 @@ class Calc2HDM:
     def setmA(self, M) :
         self.mA = M
 
+    def settb(self, tb) :
+        self.tb = tb
+
+    def setmH(self, M) :
+        self.mH = M
+
+    def setmuF(self, muF) :
+        self.muF = muF
+
+    def setmuR(self, muR) :
+        self.muR = muR
+
+    def setmHc(self, M) :
+        self.mhc = M
+   
+    def setm12(self, m12) :
+        self.m12 = m12     
+
+    def setm122(self, m122) :
+        self.m122 = m122
+
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+".in"
-        sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+".out"
+        sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+".in"
+        sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+".out"
      
         # Replacements of variables into the input file
         replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts)}
