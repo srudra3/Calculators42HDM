@@ -54,7 +54,7 @@ Block RENORMBOT # Renormalization of the bottom sector
 Block PDFSPEC
   1   CT10.LHgrid	# name of pdf (lo)
   2   CT10nlo.LHgrid	# name of pdf (nlo)
-  3   CT10nnlo.LHgrid	# name of pdf (nnlo)
+  3   CUSTOMPDFNNLO	# name of pdf (nnlo)
   4   0		# set number - if different for LO, NLO, NNLO use entries 11, 12, 13
 Block VEGAS
 # parameters for NLO SusHi
