@@ -31,7 +31,7 @@ class Calc2HDM:
         self.muR = muR
         self.muF = muF
         self.BRcomputed = 0
-   
+        self.pdf = "CT10nnlo.LHgrid" 
         #initializing all BRs
          
         self.HtoZABR = 0
@@ -82,14 +82,17 @@ class Calc2HDM:
     def setm122(self, m122) :
         self.m122 = m122
 
+    def setpdf(self,pdf) :
+        self.pdf=pdf
+
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+".in"
-        sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+".out"
+        sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+"_"+str(self.tb)+"_"+str(self.pdf)+".in"
+        sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+"_"+str(self.tb)+"_"+str(self.pdf)+".out"
      
         # Replacements of variables into the input file
-        replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts)}
+        replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts),'CUSTOMPDFNNLO':str(self.pdf)}
         sushiDefaultCard = open(sushiDefaultCardPath)
         sushiInputCard = open(sushiInputCardPath, 'w')
         for line in sushiDefaultCard:

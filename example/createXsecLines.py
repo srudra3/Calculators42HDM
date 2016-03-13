@@ -7,7 +7,7 @@ from ROOT import *
 
 def ScanPlane(mHinit,mHend,mAinit,mAend,tag, tb, muR=0.5, muF=0.5) :
     mH=mHinit
-    nIterParAxis=50
+    nIterParAxis=200
     binsizeX=(mAend-mAinit)/(nIterParAxis-1)
     binsizeY=(mHend-mHinit)/(nIterParAxis-1)
     Xsec_TH2F = TH2F("h","h",nIterParAxis,mAinit-binsizeX/2,mAend+binsizeX/2,nIterParAxis,mHinit-binsizeY/2,mHend+binsizeY/2)
@@ -33,7 +33,7 @@ def ScanPlane(mHinit,mHend,mAinit,mAend,tag, tb, muR=0.5, muF=0.5) :
         mH+=binsizeY 
     Xsec_TH2F.Write()
 
-def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
+def DrawXsecLine(mH,mAinit,tag, tb,pdf, muR=0.5, muF=0.5) :
  
     test.setmH(mH)
     test.setmHc(mH)
@@ -43,6 +43,7 @@ def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
     test.setmuR(muR)
     test.setmuF(muF)
     test.setmA(mAinit)
+    test.setpdf(pdf)
     xsec =  test.getXsecFromSusHi()
     Xsec_Gr = TGraph(50)
     Xsec_Gr.SetName("Xsec_mH"+str(test.mH)+"_tb"+str(test.tb)+"_"+tag)
@@ -53,9 +54,6 @@ def DrawXsecLine(mH,mAinit,tag, tb, muR=0.5, muF=0.5) :
         test.computeBR()
         print "ZA BR", test.HtoZABR
         Xsec_Gr.SetPoint(n,mA,1000*xsec*test.HtoZABR*test.AtobbBR*0.067)
-#        Xsec_Gr.SetPoint(n,mA,1000*xsec)
-#        Xsec_Gr.SetPoint(n,mA,test.HtoZABR)
-#        Xsec_Gr.SetPoint(n,mA,test.AtobbBR)
         mA+=2
         n+=1
     Xsec_Gr.Write()
@@ -86,36 +84,29 @@ test = Calc2HDM(mode = 'H', sqrts = sqrts, type = type, tb = tb, m12 = m12, mh =
 
 file_out = TFile("xsec.root","RECREATE")
 
-ScanPlane(300,800,50,700,"test", 1,muR = 1, muF = 1)
+#ScanPlane(300.0,800.0,50.0,722.0,"test", 1,muR = 1, muF = 1)
 
-'''
-DrawXsecLine(300,50,"05_05", 1, muR = 0.5, muF = 0.5)
-DrawXsecLine(300,50,"05_1", 1, muR = 0.5, muF = 1)
+for mH in [300,500,800]:
 
-DrawXsecLine(300,50,"1_05", 1, muR = 1, muF = 0.5)
-DrawXsecLine(300,50,"1_1", 1, muR = 1, muF = 1)
-DrawXsecLine(300,50,"1_2", 1, muR = 1, muF = 2)
-
-DrawXsecLine(300,50,"2_1", 1, muR = 2, muF = 1)
-DrawXsecLine(300,50,"2_2", 1, muR = 2, muF = 2)
-
-DrawXsecLine(500,50,"05_05", 1, muR = 0.5, muF = 0.5)
-DrawXsecLine(500,50,"05_1", 1, muR = 0.5, muF = 1)
-
-DrawXsecLine(500,50,"1_05", 1, muR = 1, muF = 0.5)
-DrawXsecLine(500,50,"1_1", 1, muR = 1, muF = 1)
-DrawXsecLine(500,50,"1_2", 1, muR = 1, muF = 2)
-
-DrawXsecLine(500,50,"2_1", 1, muR = 2, muF = 1)
-DrawXsecLine(500,50,"2_2", 1, muR = 2, muF = 2)
-
-DrawXsecLine(800,50,"05_05", 1, muR = 0.5, muF = 0.5)
-DrawXsecLine(800,50,"05_1", 1, muR = 0.5, muF = 1)
-
-DrawXsecLine(800,50,"1_05", 1, muR = 1, muF = 0.5)
-DrawXsecLine(800,50,"1_1", 1, muR = 1, muF = 1)
-DrawXsecLine(800,50,"1_2", 1, muR = 1, muF = 2)
-
-DrawXsecLine(800,50,"2_1", 1, muR = 2, muF = 1)
-DrawXsecLine(800,50,"2_2", 1, muR = 2, muF = 2)
-'''
+	for tgbeta in [0.5,1,1.5]:
+	        tgbetaS="init"
+	        if tgbeta==0.5 :
+	 		tbetaS="tgbeta05"
+		if tgbeta==1 :
+			tbetaS="tgbeta1"
+		if tgbeta==1.5 :
+			tbetaS="tgbeta15"
+	 
+		DrawXsecLine(mH,50,"1_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 1)
+	        DrawXsecLine(mH,50,"1_1_"+tbetaS+"MMHT2014nnlo68cl", tgbeta,'MMHT2014nnlo68cl.LHgrid', muR = 1, muF = 1)
+		DrawXsecLine(mH,50,"1_1_"+tbetaS+"NNPDF30_nnlo", tgbeta,'NNPDF30_nnlo_as_0118', muR = 1, muF = 1)
+	    
+		DrawXsecLine(300,50,"05_05_"+tbetaS+"_CT10nnlo", tgbeta, 'CT10nnlo.LHgrid',muR = 0.5, muF = 0.5)
+		DrawXsecLine(300,50,"05_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 0.5, muF = 1)
+		
+		DrawXsecLine(300,50,"1_05_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 0.5)
+		DrawXsecLine(300,50,"1_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 1)
+		DrawXsecLine(300,50,"1_2_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 2)
+		
+		DrawXsecLine(300,50,"2_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 2, muF = 1)
+		DrawXsecLine(300,50,"2_2_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 2, muF = 2)
