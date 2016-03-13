@@ -101,12 +101,12 @@ for mH in [300,500,800]:
 	        DrawXsecLine(mH,50,"1_1_"+tbetaS+"MMHT2014nnlo68cl", tgbeta,'MMHT2014nnlo68cl.LHgrid', muR = 1, muF = 1)
 		DrawXsecLine(mH,50,"1_1_"+tbetaS+"NNPDF30_nnlo", tgbeta,'NNPDF30_nnlo_as_0118', muR = 1, muF = 1)
 	    
-		DrawXsecLine(300,50,"05_05_"+tbetaS+"_CT10nnlo", tgbeta, muR = 0.5, muF = 0.5)
-		DrawXsecLine(300,50,"05_1_"+tbetaS+"_CT10nnlo", tgbeta, muR = 0.5, muF = 1)
+		DrawXsecLine(300,50,"05_05_"+tbetaS+"_CT10nnlo", tgbeta, 'CT10nnlo.LHgrid',muR = 0.5, muF = 0.5)
+		DrawXsecLine(300,50,"05_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 0.5, muF = 1)
 		
-		DrawXsecLine(300,50,"1_05_"+tbetaS+"_CT10nnlo", tgbeta, muR = 1, muF = 0.5)
-		DrawXsecLine(300,50,"1_1_"+tbetaS+"_CT10nnlo", tgbeta, muR = 1, muF = 1)
-		DrawXsecLine(300,50,"1_2_"+tbetaS+"_CT10nnlo", tgbeta, muR = 1, muF = 2)
+		DrawXsecLine(300,50,"1_05_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 0.5)
+		DrawXsecLine(300,50,"1_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 1)
+		DrawXsecLine(300,50,"1_2_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 1, muF = 2)
 		
-		DrawXsecLine(300,50,"2_1_"+tbetaS+"_CT10nnlo", tgbeta, muR = 2, muF = 1)
-		DrawXsecLine(300,50,"2_2_"+tbetaS+"_CT10nnlo", tgbeta, muR = 2, muF = 2)
+		DrawXsecLine(300,50,"2_1_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 2, muF = 1)
+		DrawXsecLine(300,50,"2_2_"+tbetaS+"_CT10nnlo", tgbeta,'CT10nnlo.LHgrid', muR = 2, muF = 2)
