@@ -27,10 +27,6 @@ Edit the makefile, to link the proper 2HDMC version (1.7.0 in the line 2HDMCPATH
     cd ..
 
 
-## create repository where sushi cards will go
-    
-    mkdir Scan
-
 ## Run the test
     
     python example/test.py
