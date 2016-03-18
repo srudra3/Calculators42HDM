@@ -1,8 +1,19 @@
 # Packages #
 ############
 *.tar
+*.tar.gz
 
 
 # PYC #
 #######
 *.pyc
+
+# externals #
+#############
+SusHi*
+2HDMC*
+
+# Scans #
+#########
+Scan/*.in
+Scan/*.out

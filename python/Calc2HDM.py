@@ -103,8 +103,14 @@ class Calc2HDM:
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        sushiInputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+"_"+str(self.tb)+"_"+str(self.pdf)+".in"
-        sushiOutputCardPath = "Scan/"+str(self.mH)+"_"+str(self.mA)+"_"+str(self.muF)+"_"+str(self.muR)+"_"+str(self.tb)+"_"+str(self.pdf)+".out"
+        sushiCardName = (str(self.mH).replace('.', 'p').replace('-', 'm') +
+            "_" + str(self.mA).replace('.', 'p').replace('-', 'm') +
+            "_" + str(self.muF).replace('.', 'p').replace('-', 'm') +
+            "_" + str(self.muR).replace('.', 'p').replace('-', 'm') + 
+            "_" + str(self.tb).replace('.', 'p').replace('-', 'm') +
+            "_" + str(self.pdf)) # keep the dots in the pdf name
+        sushiInputCardPath = "Scan/" + sushiCardName + ".in"
+        sushiOutputCardPath = "Scan/" + sushiCardName + ".out"
      
         # Replacements of variables into the input file
         replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts),'CUSTOMPDFNNLO':str(self.pdf)}
