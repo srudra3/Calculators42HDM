@@ -72,6 +72,9 @@ class Calc2HDM:
         self.htoggBR = 0
         self.AtoggBR = 0
 
+        self.stability = 0
+        self.unitarity = 0
+        self.perturbativity = 0
 
     def setmA(self, M) :
         self.mA = M
@@ -137,7 +140,8 @@ class Calc2HDM:
         XsecLine3 = XsecLine2.replace("   # ggh XS in pb                  ","")
         Xsec = float(XsecLine3)
         sushiOutputCard.close()
-     
+
+ 
         return Xsec
 
 
@@ -147,7 +151,29 @@ class Calc2HDM:
         command = "./2HDMC-1.7.0/CalcPhys "+str(self.mh)+" "+str(self.mH)+" "+str(self.mA)+" "+str(self.mhc)+" "+str(self.sba)+" 0 0 "+str(self.m12_2)+" "+str(self.tb)+" "+str(self.type)+" "+ self.outputFile
         os.system(command)
 
+        print "reading theory constraints from "+ self.outputFile
+
         ParamCard = open(self.outputFile,'r')
+
+        linecache.clearcache()
+
+        UnitLine = linecache.getline(self.outputFile,14)
+        UnitLine2 = UnitLine.replace("    2    ","")
+        UnitLine3 = UnitLine2.replace("    #  Tree-level unitarity (1=Yes, 0=no)","")
+        print UnitLine
+        self.unitarity = bool(int(UnitLine3))
+
+        PertLine = linecache.getline(self.outputFile,15)
+        PertLine2 = PertLine.replace("    3    ","")
+        PertLine3 = PertLine2.replace("    #  Perturbativity (1=Yes, 0=no)","")
+        self.perturbativity = bool(int(PertLine3))
+        print PertLine
+
+        StabLine = linecache.getline(self.outputFile,16)
+        StabLine2 = StabLine.replace("    4    ","")
+        StabLine3 = StabLine2.replace("    #  Stability (1=Yes, 0=no)","")
+        self.stability = bool(int(StabLine3))
+        print StabLine
 
         modeh=0
         modeH=0
@@ -289,4 +315,6 @@ class Calc2HDM:
                 self.AtoglugluBR = float(glugluBRLine3)
               elif modeh == 1 :
                 self.htoglugluBR = float(glugluBRLine3)
-    
+
+        ParamCard.close()
+ 
