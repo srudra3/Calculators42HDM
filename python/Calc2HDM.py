@@ -128,14 +128,14 @@ class Calc2HDM:
      
         #running SusHi
         print "Running SusHi with command : ",
-        run_sushi="./SusHi-1.5.0/bin/sushi "+sushiInputCardPath+" "+sushiOutputCardPath+" "
+        run_sushi="./SusHi-1.6.1/bin/sushi "+sushiInputCardPath+" "+sushiOutputCardPath+" "
         print run_sushi
         os.system(run_sushi)
      
      
         # extracting xsec from the output file
         sushiOutputCard = open(sushiOutputCardPath,'r')
-        XsecLine = linecache.getline(sushiOutputCardPath,16)
+        XsecLine = linecache.getline(sushiOutputCardPath,19)
         XsecLine2 = XsecLine.replace("         1     ","")
         XsecLine3 = XsecLine2.replace("   # ggh XS in pb                  ","")
         Xsec = float(XsecLine3)
@@ -193,7 +193,7 @@ class Calc2HDM:
                 modeA = 1
         	modeH = 0
             elif "23    36" in line :
-        	ABRLine2 = line.replace("       ","")
+        	ZABRLine2 = line.replace("       ","")
         	ZABRLine3 = ZABRLine2.replace("     2      23    36","")
                 if modeH == 1 :
         	    self.HtoZABR = float(ZABRLine3)

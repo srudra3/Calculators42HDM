@@ -19,12 +19,14 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
 
 ##Second, SusHi installation :
 
-    wget http://www.hepforge.org/archive/sushi/SusHi-1.5.0.tar.gz
-    tar -zxvf SusHi-1.5.0.tar.gz
-    cd SusHi-1.5.0
+    wget http://www.hepforge.org/archive/sushi/SusHi-1.6.1.tar.gz
+    tar -zxvf SusHi-1.6.1.tar.gz
+    cd SusHi-1.6.1
     ./configure
 
 Edit the makefile, to link the proper 2HDMC version (1.7.0 in the line 2HDMCPATH = ../2HDMC-1.6.3)
+    sed -i -e 's;2HDMCPATH = ../2HDMC-1.6.3;2HDMCPATH = ../2HDMC-1.7.0;g' Makefile
+    sed -i -e 's;2HDMCVERSION = 1.6.3;2HDMCVERSION = 1.7.0;g' Makefile
 
     make predef=2HDMC
     cd ..
