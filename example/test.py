@@ -28,4 +28,4 @@ print "xsec : ",  test.getXsecFromSusHi()
 
 test.setmA(200)
 test.computeBR()
-print "ZZ BR", test.HtoZZBR
+print "ZZ BR second test", test.HtoZZBR

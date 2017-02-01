@@ -31,6 +31,8 @@ Edit the makefile, to link the proper 2HDMC version (1.7.0 in the line 2HDMCPATH
     make predef=2HDMC
     cd ..
 
+    source first_setup.sh
+
 
 ## Run the test
     

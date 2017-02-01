@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import os
+import subprocess
 import sys
 import linecache
 
@@ -127,29 +127,34 @@ class Calc2HDM:
         sushiInputCard.close()
      
         #running SusHi
-        print "Running SusHi with command : ",
-        run_sushi="./SusHi-1.6.1/bin/sushi "+sushiInputCardPath+" "+sushiOutputCardPath+" "
-        print run_sushi
-        os.system(run_sushi)
+#        print "Running SusHi with command : ",
+        run_sushi = ["./SusHi-1.6.1/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
+#        print ' '.join(run_sushi)
+        log = sushiOutputCardPath.replace('out', 'log')
+        with open(log, 'w') as f:
+            subprocess.Popen(run_sushi, stdout=f, stderr=f)
      
-     
+        Xsec = None
         # extracting xsec from the output file
-        sushiOutputCard = open(sushiOutputCardPath,'r')
-        XsecLine = linecache.getline(sushiOutputCardPath,19)
-        XsecLine2 = XsecLine.replace("         1     ","")
-        XsecLine3 = XsecLine2.replace("   # ggh XS in pb                  ","")
-        Xsec = float(XsecLine3)
-        sushiOutputCard.close()
-
- 
+        with open(sushiOutputCardPath,'r') as f:
+            for line in f:
+                if '# ggh XS in pb' not in line:
+                    continue
+                Xsec = line.split()[1]
+                break
         return Xsec
 
 
 
     def computeBR(self):
 
-        command = "./2HDMC-1.7.0/CalcPhys "+str(self.mh)+" "+str(self.mH)+" "+str(self.mA)+" "+str(self.mhc)+" "+str(self.sba)+" 0 0 "+str(self.m12_2)+" "+str(self.tb)+" "+str(self.type)+" "+ self.outputFile
-        os.system(command)
+        command = ["./2HDMC-1.7.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
+        print 'Running 2HDMC with command', ' '.join(command)
+        log = self.outputFile.replace('dat', 'log')
+#        subprocess.call(['pwd'])
+        with open(log, 'w') as f:
+            subprocess.Popen(command, stdout=f, stderr=f)
+#        os.system(command)
 
         print "reading theory constraints from "+ self.outputFile
 
