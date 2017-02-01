@@ -25,6 +25,7 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
     ./configure
 
 Edit the makefile, to link the proper 2HDMC version (1.7.0 in the line 2HDMCPATH = ../2HDMC-1.6.3)
+
     sed -i -e 's;2HDMCPATH = ../2HDMC-1.6.3;2HDMCPATH = ../2HDMC-1.7.0;g' Makefile
     sed -i -e 's;2HDMCVERSION = 1.6.3;2HDMCVERSION = 1.7.0;g' Makefile
 
