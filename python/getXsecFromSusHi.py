@@ -25,14 +25,15 @@ def getXsecFromSusHi( mode = 'H', sqrts = 13000, tb = 1, m12 = 0, mh = 125, mH =
     os.system(run_sushi)
 
 
+    Xsec = None
     # extracting xsec from the output file
-    sushiOutputCard = open(sushiOutputCardPath,'r')
-    XsecLine = linecache.getline(sushiOutputCardPath,16)
-    XsecLine2 = XsecLine.replace("         1     ","")
-    XsecLine3 = XsecLine2.replace("   # ggh XS in pb                  ","")
-    Xsec = float(XsecLine3)
-    sushiOutputCard.close()
-
+    with open(sushiOutputCardPath,'r') as f:
+        for line in f:
+            if '# ggh XS in pb' not in f:
+                continue
+            print line.split()
+            Xsec = line.split()[1]
+            break
     return Xsec 
     
 
