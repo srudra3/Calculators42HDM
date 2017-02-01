@@ -2,7 +2,7 @@
 import subprocess
 import sys
 import linecache
-
+import os
 
 class Calc2HDM:
     def __init__(self, mode = 'H', sqrts = 13000,  muR = 0.5, muF = 0.5, type = 2, tb = 1, m12 = 0, mh = 125, mH = 350, mA = 400, mhc = 420, sba = 0.99, outputFile = "out.dat"):
@@ -75,6 +75,21 @@ class Calc2HDM:
         self.stability = 0
         self.unitarity = 0
         self.perturbativity = 0
+    def __str__(self):
+        return """tb= %.2f
+m12= %.2f
+mh= %.2f
+mH= %.2f
+mA= %.2f
+mhc= %.2f
+sba= %.2f
+type= %i
+outputFile= %s
+sqrts= %.2f
+muR= %.2f
+muF= %.2f
+BRcomputed= %.2f
+pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, self.type, self.outputFile, self.sqrts, self.muR, self.muF, self.BRcomputed, self.pdf)
 
     def setmA(self, M) :
         self.mA = M
@@ -106,7 +121,8 @@ class Calc2HDM:
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        sushiCardName = (str(self.mH).replace('.', 'p').replace('-', 'm') +
+        sushiCardName = (
+            str(self.mH).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.mA).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.muF).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.muR).replace('.', 'p').replace('-', 'm') + 
@@ -116,210 +132,222 @@ class Calc2HDM:
         sushiOutputCardPath = "Scan/" + sushiCardName + ".out"
      
         # Replacements of variables into the input file
-        replacements = {'MODE':str(self.mode),'TANBETA':str(self.tb),'M12':str(self.m12),'MSMH':str(self.mh),'MHEAVYH':str(self.mH), 'MPSA':str(self.mA), 'MCHARGEDH':str(self.mhc), 'SINBA':str(self.sba), 'MUR':str(self.muR), 'MUF':str(self.muF),'TYPE':str(int(self.type)), 'SQRTS':str(self.sqrts),'CUSTOMPDFNNLO':str(self.pdf)}
-        sushiDefaultCard = open(sushiDefaultCardPath)
-        sushiInputCard = open(sushiInputCardPath, 'w')
-        for line in sushiDefaultCard:
-            for src, target in replacements.iteritems():
-                line = line.replace(src, target)
-            sushiInputCard.write(line)
-        sushiDefaultCard.close()
-        sushiInputCard.close()
+        replacements = {
+            'MODE':str(self.mode),
+            'TANBETA':str(self.tb),
+            'M12':str(self.m12),
+            'MSMH':str(self.mh),
+            'MHEAVYH':str(self.mH),
+            'MPSA':str(self.mA),
+            'MCHARGEDH':str(self.mhc),
+            'SINBA':str(self.sba),
+            'MUR':str(self.muR),
+            'MUF':str(self.muF),
+            'TYPE':str(int(self.type)),
+            'SQRTS':str(self.sqrts),
+            'CUSTOMPDFNNLO':str(self.pdf)
+            }
+#        print replacements
+        with open(sushiDefaultCardPath) as f1:
+            with open(sushiInputCardPath,'w') as f2:
+                for line in f1:
+                    newline = line
+                    for src, target in replacements.iteritems():
+                        newline = newline.replace(src, target)
+                    f2.write(newline)
      
         #running SusHi
-#        print "Running SusHi with command : ",
+        pwd = subprocess.Popen(['pwd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pwd, err = pwd.communicate()
+        pwd = pwd.replace('\n', '')
         run_sushi = ["./SusHi-1.6.1/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
-#        print ' '.join(run_sushi)
+        print ' '.join(run_sushi)
         log = sushiOutputCardPath.replace('out', 'log')
         with open(log, 'w') as f:
-            subprocess.Popen(run_sushi, stdout=f, stderr=f)
+            p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=pwd)
+            p.communicate() # wait until process finishes
      
         Xsec = None
         # extracting xsec from the output file
-        with open(sushiOutputCardPath,'r') as f:
+        with open(os.path.join(pwd, sushiOutputCardPath),'r') as f:
             for line in f:
                 if '# ggh XS in pb' not in line:
                     continue
                 Xsec = line.split()[1]
                 break
-        return Xsec
+        return float(Xsec)
 
 
 
     def computeBR(self):
 
+        pwd = subprocess.Popen(['pwd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pwd, err = pwd.communicate()
+        pwd = pwd.replace('\n', '')
         command = ["./2HDMC-1.7.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
-        print 'Running 2HDMC with command', ' '.join(command)
+        print ' '.join(command)
         log = self.outputFile.replace('dat', 'log')
-#        subprocess.call(['pwd'])
         with open(log, 'w') as f:
-            subprocess.Popen(command, stdout=f, stderr=f)
-#        os.system(command)
+            p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
+            p.communicate() # wait until process finishes
 
         print "reading theory constraints from "+ self.outputFile
 
-        ParamCard = open(self.outputFile,'r')
-
-        linecache.clearcache()
-
-        UnitLine = linecache.getline(self.outputFile,14)
-        UnitLine2 = UnitLine.replace("    2    ","")
-        UnitLine3 = UnitLine2.replace("    #  Tree-level unitarity (1=Yes, 0=no)","")
-        print UnitLine
-        self.unitarity = bool(int(UnitLine3))
-
-        PertLine = linecache.getline(self.outputFile,15)
-        PertLine2 = PertLine.replace("    3    ","")
-        PertLine3 = PertLine2.replace("    #  Perturbativity (1=Yes, 0=no)","")
-        self.perturbativity = bool(int(PertLine3))
-        print PertLine
-
-        StabLine = linecache.getline(self.outputFile,16)
-        StabLine2 = StabLine.replace("    4    ","")
-        StabLine3 = StabLine2.replace("    #  Stability (1=Yes, 0=no)","")
-        self.stability = bool(int(StabLine3))
-        print StabLine
-
+        UnitLine = None
+        PertLine = None
+        StabLine = None
+        with open(os.path.join(self.outputFile)) as f:
+            for line in f:
+                if 'unitarity' in line:
+                    UnitLine = line
+                    self.unitarity = bool(int(line.split()[1]))
+                if 'Perturbativity' in line:
+                    PertLine = line
+                    self.perturbativity = bool(int(line.split()[1]))
+                if 'Stability' in line:
+                    StabLine = line
+                    self.stability = bool(int(line.split()[1]))
+                if UnitLine and PertLine and StabLine:
+                    break # stop parsing the file if we have all the informations...
+            
         modeh=0
         modeH=0
         modeA=0
       
-        for line in ParamCard :
-            if "DECAY  25" in line :
-                modeh = 1
-                modeH = 0
-                modeA = 0
-            if "DECAY  35" in line :
-                modeh = 0
-                modeH = 1
-    	        modeA = 0
-            elif "DECAY  36" in line :
-                modeh = 0
-                modeA = 1
-        	modeH = 0
-            elif "23    36" in line :
-        	ZABRLine2 = line.replace("       ","")
-        	ZABRLine3 = ZABRLine2.replace("     2      23    36","")
-                if modeH == 1 :
-        	    self.HtoZABR = float(ZABRLine3)
-                elif modeh == 1 :
-                    self.htoZABR = float(ZABRLine3)
-
-        	  #print "BR ZA", ZABR,
-        
-            elif "23    35" in line and modeA == 1 :
-                ZHBRLine2 = line.replace("       ","")
-                ZHBRLine3 = ZHBRLine2.replace("     2      23    35","")
-                self.AtoZHBR = float(ZHBRLine3)
-        
-        
-            elif "36    36" in line :
-                AABRLine2 = line.replace("       ","")
-                AABRLine3 = AABRLine2.replace("     2      36    36","")
-                if modeH == 1 :
-                    self.HtoAABR = float(AABRLine3)
-                elif modeh == 1 :
-                    self.htoAABR = float(AABRLine3)
-
-                #print "BR ZA", ZABR,
-        
-            elif "35    35" in line and modeH == 1 :
-              HHBRLine2 = line.replace("       ","")
-              HHBRLine3 = HHBRLine2.replace("     2      35    35","")
-              self.AtoHHBR = float(HHBRLine3)
-        
-        
-            elif "5    -5" in line :
-              bbBRLine2 = line.replace("     2       5    -5","")
-              bbBRLine3 = bbBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtobbBR = float(bbBRLine3)
-              elif modeA == 1 :
-                self.AtobbBR = float(bbBRLine3)
-              elif modeh == 1 :
-                self.htobbBR = float(bbBRLine3)
-        
-            elif "23    25" in line :
-              ZhBRLine2 = line.replace("     2      23    25","")
-              ZhBRLine3 = ZhBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtoZhBR = float(ZhBRLine3)
-              elif modeA == 1 :
-                self.AtoZhBR = float(ZhBRLine3)
-        
-        
-            elif "6    -6" in line :
-              ttBRLine2 = line.replace("     2       6    -6","")
-              ttBRLine3 = ttBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtottBR = float(ttBRLine3)
-              elif modeA == 1 :
-                self.AtottBR = float(ttBRLine3)
-              elif modeh == 1 :
-                self.htottBR = float(ttBRLine3)
-        
-            elif "15   -15" in line :
-              tautauBRLine2 = line.replace("     2      15   -15","")
-              tautauBRLine3 = tautauBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtotautauBR = float(tautauBRLine3)
-              elif modeA == 1 :
-                self.AtotautauBR = float(tautauBRLine3)
-              elif modeh == 1 :
-                self.htotautauBR = float(tautauBRLine3)
-              #print "BR tautau", tautauBR
-        
-            elif "25    25" in line :
-              hhBRLine2 = line.replace("     2      25    25","")
-              hhBRLine3 = hhBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtohhBR = float(hhBRLine3)
-              elif modeA == 1 :
-                self.AtohhBR = float(hhBRLine3)
-              #print "BR hh", hhBR
-        
-            elif "23    23" in line :
-              ZZBRLine2 = line.replace("     2      23    23","")
-              ZZBRLine3 = ZZBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtoZZBR = float(ZZBRLine3)
-              elif modeA == 1 :
-                self.AtoZZBR = float(ZZBRLine3)
-              elif modeh == 1 :
-                self.htoZZBR = float(ZZBRLine3)
-              #print "BR ZZ", ZZBR
-        
-            elif "24   -24" in line :
-              WWBRLine2 = line.replace("     2      24   -24","")
-              WWBRLine3 = WWBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtoWWBR = float(WWBRLine3)
-              elif modeA == 1 :
-                self.AtoWWBR = float(WWBRLine3)
-              elif modeh == 1 :
-                self.htoWWBR = float(WWBRLine3)
-              #print "BR WW", WWBR
-        
-            elif "22    22" in line :
-              ggBRLine2 = line.replace("     2      22    22","")
-              ggBRLine3 = ggBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtoggBR = float(ggBRLine3)
-              elif modeA == 1 :
-                self.AtoggBR = float(ggBRLine3)
-              elif modeh == 1 :
-                self.htoggBR = float(ggBRLine3)
-              #print "BR gg", ggBR
-       
-            elif "21    21" in line :
-              glugluBRLine2 = line.replace("     2      21    21","")
-              glugluBRLine3 = glugluBRLine2.replace("       ","")
-              if modeH == 1 :
-                self.HtoglugluBR = float(glugluBRLine3)
-              elif modeA == 1 :
-                self.AtoglugluBR = float(glugluBRLine3)
-              elif modeh == 1 :
-                self.htoglugluBR = float(glugluBRLine3)
-
-        ParamCard.close()
- 
+        with open(self.outputFile) as f:
+            for line in f:
+                if "DECAY  25" in line :
+                    modeh = 1
+                    modeH = 0
+                    modeA = 0
+                if "DECAY  35" in line :
+                    modeh = 0
+                    modeH = 1
+                    modeA = 0
+                elif "DECAY  36" in line :
+                    modeh = 0
+                    modeA = 1
+                    modeH = 0
+                elif "23    36" in line :
+                    ZABRLine2 = line.replace("       ","")
+                    ZABRLine3 = ZABRLine2.replace("     2      23    36","")
+                    if modeH == 1 :
+                        self.HtoZABR = float(ZABRLine3)
+                    elif modeh == 1 :
+                        self.htoZABR = float(ZABRLine3)
+    
+                  #print "BR ZA", ZABR,
+            
+                elif "23    35" in line and modeA == 1 :
+                    ZHBRLine2 = line.replace("       ","")
+                    ZHBRLine3 = ZHBRLine2.replace("     2      23    35","")
+                    self.AtoZHBR = float(ZHBRLine3)
+            
+            
+                elif "36    36" in line :
+                    AABRLine2 = line.replace("       ","")
+                    AABRLine3 = AABRLine2.replace("     2      36    36","")
+                    if modeH == 1 :
+                        self.HtoAABR = float(AABRLine3)
+                    elif modeh == 1 :
+                        self.htoAABR = float(AABRLine3)
+    
+                    #print "BR ZA", ZABR,
+            
+                elif "35    35" in line and modeH == 1 :
+                  HHBRLine2 = line.replace("       ","")
+                  HHBRLine3 = HHBRLine2.replace("     2      35    35","")
+                  self.AtoHHBR = float(HHBRLine3)
+            
+            
+                elif "5    -5" in line :
+                  bbBRLine2 = line.replace("     2       5    -5","")
+                  bbBRLine3 = bbBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtobbBR = float(bbBRLine3)
+                  elif modeA == 1 :
+                    self.AtobbBR = float(bbBRLine3)
+                  elif modeh == 1 :
+                    self.htobbBR = float(bbBRLine3)
+            
+                elif "23    25" in line :
+                  ZhBRLine2 = line.replace("     2      23    25","")
+                  ZhBRLine3 = ZhBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoZhBR = float(ZhBRLine3)
+                  elif modeA == 1 :
+                    self.AtoZhBR = float(ZhBRLine3)
+            
+            
+                elif "6    -6" in line :
+                  ttBRLine2 = line.replace("     2       6    -6","")
+                  ttBRLine3 = ttBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtottBR = float(ttBRLine3)
+                  elif modeA == 1 :
+                    self.AtottBR = float(ttBRLine3)
+                  elif modeh == 1 :
+                    self.htottBR = float(ttBRLine3)
+            
+                elif "15   -15" in line :
+                  tautauBRLine2 = line.replace("     2      15   -15","")
+                  tautauBRLine3 = tautauBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtotautauBR = float(tautauBRLine3)
+                  elif modeA == 1 :
+                    self.AtotautauBR = float(tautauBRLine3)
+                  elif modeh == 1 :
+                    self.htotautauBR = float(tautauBRLine3)
+                  #print "BR tautau", tautauBR
+            
+                elif "25    25" in line :
+                  hhBRLine2 = line.replace("     2      25    25","")
+                  hhBRLine3 = hhBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtohhBR = float(hhBRLine3)
+                  elif modeA == 1 :
+                    self.AtohhBR = float(hhBRLine3)
+                  #print "BR hh", hhBR
+            
+                elif "23    23" in line :
+                  ZZBRLine2 = line.replace("     2      23    23","")
+                  ZZBRLine3 = ZZBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoZZBR = float(ZZBRLine3)
+                  elif modeA == 1 :
+                    self.AtoZZBR = float(ZZBRLine3)
+                  elif modeh == 1 :
+                    self.htoZZBR = float(ZZBRLine3)
+                  #print "BR ZZ", ZZBR
+            
+                elif "24   -24" in line :
+                  WWBRLine2 = line.replace("     2      24   -24","")
+                  WWBRLine3 = WWBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoWWBR = float(WWBRLine3)
+                  elif modeA == 1 :
+                    self.AtoWWBR = float(WWBRLine3)
+                  elif modeh == 1 :
+                    self.htoWWBR = float(WWBRLine3)
+                  #print "BR WW", WWBR
+            
+                elif "22    22" in line :
+                  ggBRLine2 = line.replace("     2      22    22","")
+                  ggBRLine3 = ggBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoggBR = float(ggBRLine3)
+                  elif modeA == 1 :
+                    self.AtoggBR = float(ggBRLine3)
+                  elif modeh == 1 :
+                    self.htoggBR = float(ggBRLine3)
+                  #print "BR gg", ggBR
+           
+                elif "21    21" in line :
+                  glugluBRLine2 = line.replace("     2      21    21","")
+                  glugluBRLine3 = glugluBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoglugluBR = float(glugluBRLine3)
+                  elif modeA == 1 :
+                    self.AtoglugluBR = float(glugluBRLine3)
+                  elif modeh == 1 :
+                    self.htoglugluBR = float(glugluBRLine3)
