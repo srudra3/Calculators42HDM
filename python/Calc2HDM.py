@@ -118,6 +118,9 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
     def setpdf(self,pdf) :
         self.pdf=pdf
 
+    def setoutputFile(self,outputFile) :
+        self.outputFile=outputFile
+
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
@@ -157,9 +160,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     f2.write(newline)
      
         #running SusHi
-        pwd = subprocess.Popen(['pwd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        pwd, err = pwd.communicate()
-        pwd = pwd.replace('\n', '')
+        pwd = os.getcwd()
         run_sushi = ["./SusHi-1.6.1/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
         print ' '.join(run_sushi)
         log = sushiOutputCardPath.replace('out', 'log')
@@ -181,9 +182,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
 
     def computeBR(self):
 
-        pwd = subprocess.Popen(['pwd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        pwd, err = pwd.communicate()
-        pwd = pwd.replace('\n', '')
+        pwd = os.getcwd()
         command = ["./2HDMC-1.7.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
         print ' '.join(command)
         log = self.outputFile.replace('dat', 'log')
@@ -191,7 +190,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
             p.communicate() # wait until process finishes
 
-        print "reading theory constraints from "+ self.outputFile
+#        print "reading theory constraints from "+ self.outputFile
 
         UnitLine = None
         PertLine = None
