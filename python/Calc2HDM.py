@@ -97,6 +97,9 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
     def settb(self, tb) :
         self.tb = tb
 
+    def setsba(self, sba) :
+        self.sba = sba
+
     def setmH(self, M) :
         self.mH = M
 
