@@ -32,7 +32,17 @@ class Calc2HDM:
         self.muF = muF
         self.BRcomputed = 0
         self.pdf = "CT10nnlo.LHgrid" 
+        self.lambda_1 = 0
+        self.lambda_2 = 0
+        self.lambda_3 = 0
+        self.lambda_4 = 0
+        self.lambda_5 = 0
+        self.lambda_6 = 0
+        self.lambda_7 = 0
         #initializing all BRs
+        self.Hwidth = 0
+        self.hwidth = 0
+        self.Awidth = 0
          
         self.HtoZABR = 0
         self.AtoZHBR = 0
@@ -219,14 +229,17 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         with open(self.outputFile) as f:
             for line in f:
                 if "DECAY  25" in line :
+                    self.hwidth = float(line.split()[2])
                     modeh = 1
                     modeH = 0
                     modeA = 0
                 if "DECAY  35" in line :
+                    self.Hwidth = float(line.split()[2])
                     modeh = 0
                     modeH = 1
                     modeA = 0
                 elif "DECAY  36" in line :
+                    self.Awidth = float(line.split()[2])
                     modeh = 0
                     modeA = 1
                     modeH = 0
@@ -353,3 +366,18 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoglugluBR = float(glugluBRLine3)
                   elif modeh == 1 :
                     self.htoglugluBR = float(glugluBRLine3)
+
+                elif "lambda_1" in line:
+                    self.lambda_1 = line.split()[1]
+                elif "lambda_2" in line:
+                    self.lambda_2 = line.split()[1]
+                elif "lambda_3" in line:
+                    self.lambda_3 = line.split()[1]
+                elif "lambda_4" in line:
+                    self.lambda_4 = line.split()[1]
+                elif "lambda_5" in line:
+                    self.lambda_5 = line.split()[1]
+                elif "lambda_6" in line:
+                    self.lambda_6 = line.split()[1]
+                elif "lambda_7" in line:
+                    self.lambda_7 = line.split()[1]
