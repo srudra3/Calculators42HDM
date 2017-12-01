@@ -8,7 +8,7 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
     scram b
     cmsenv
 
-##First, installation of 2HDMC
+## First, installation of 2HDMC
 
     cd cp3_llbb/Calculators42HDM
     wget http://www.hepforge.org/archive/2hdmc/2HDMC-1.7.0.tar.gz
@@ -17,7 +17,7 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
     make
     cd ..
 
-##Second, SusHi installation :
+## Second, SusHi installation :
 
     wget http://www.hepforge.org/archive/sushi/SusHi-1.6.1.tar.gz
     tar -zxvf SusHi-1.6.1.tar.gz
