@@ -17,3 +17,10 @@ SusHi*
 #########
 Scan/*.in
 Scan/*.out
+*.out_murdep
+*.dat
+*.log
+
+# tmp files #
+#############
+*.swp
