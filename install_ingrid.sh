@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 # In a CMSSW release
 git clone -o upstream git@github.com:cp3-llbb/Calculators42HDM.git cp3_llbb/Calculators42HDM
 module load /nfs/soft/modules/lhapdf/6.1
@@ -27,4 +28,4 @@ make predef=2HDMC
 cd ..
 
 source first_setup.sh
-
+set +x
