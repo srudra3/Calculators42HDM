@@ -47,7 +47,7 @@ Block SCALES
   2   MUF	# factorization scale muF/mh
  11   1.0 	# renormalization scale muR/mh for bbh
  12   0.25	# factorization scale muF/mh for bbh
-  3   0         # 1 = Use (muR,muF)/Sqrt(mh^2+pt^2) for dsigma/dpt and d^2sigma/dy/dpt
+  3   1         # 1 = Use (muR,muF)/Sqrt(mh^2+pt^2) for dsigma/dpt and d^2sigma/dy/dpt
 Block RENORMBOT # Renormalization of the bottom sector
   1   0 	# m_b used for bottom Yukawa:  0 = OS, 1 = MSbar(m_b), 2 = MSbar(muR)
   4   4.75d0    # Fixed value of m_b^OS
