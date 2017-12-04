@@ -28,4 +28,5 @@ make predef=2HDMC
 cd ..
 
 source first_setup.sh
+cd ${CMSSW_BASE}
 set +x
