@@ -175,21 +175,34 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         #running SusHi
         pwd = os.getcwd()
         run_sushi = ["./SusHi-1.6.1/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
-        print ' '.join(run_sushi)
-        log = sushiOutputCardPath.replace('out', 'log')
-        with open(log, 'w') as f:
-            p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=pwd)
-            p.communicate() # wait until process finishes
+        if not os.path.isfile(sushiOutputCardPath):
+            print ' '.join(run_sushi)
+            log = sushiOutputCardPath.replace('out', 'log')
+            with open(log, 'w') as f:
+                p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=pwd)
+                p.communicate() # wait until process finishes
+        else:
+            print '# SusHi was run already, looking for results in %s' % sushiOutputCardPath
      
         Xsec = None
         # extracting xsec from the output file
         with open(os.path.join(pwd, sushiOutputCardPath),'r') as f:
+            Xsec = 0 # ggh XS in pb
+            integerror = 0 # +/- integ. error: ggh XS in pb
+            muRm = 0 # - from muR variation: ggh XS in pb
+            muRp = 0 # + from muR variation: ggh XS in pb
             for line in f:
-                if '# ggh XS in pb' not in line:
+                if 'ggh XS in pb' not in line:
                     continue
-                Xsec = line.split()[1]
-                break
-        return float(Xsec)
+                if ' 1 ' in line:
+                    Xsec = line.split()[1]
+                elif ' 101 ' in line:
+                    integerror = line.split()[1]
+                elif ' 102 ' in line:
+                    muRm = line.split()[1]
+                elif ' 103 ' in line:
+                    muRp = line.split()[1]
+        return float(Xsec), float(integerror), float(muRm), float(muRm)
 
 
 
@@ -197,11 +210,16 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
 
         pwd = os.getcwd()
         command = ["./2HDMC-1.7.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
-        print ' '.join(command)
-        log = self.outputFile.replace('dat', 'log')
-        with open(log, 'w') as f:
-            p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
-            p.communicate() # wait until process finishes
+        outputExists = False # FIXME: default output is out.dat, not really bug-proof...
+        # outputExists = os.path.isfile(self.outputFile)
+        if not outputExists:
+            print ' '.join(command)
+            log = self.outputFile.replace('dat', 'log')
+            with open(log, 'w') as f:
+                p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
+                p.communicate() # wait until process finishes
+        else:
+            print '# 2HDMC was run already, looking for results in %s' % self.outputFile
 
 #        print "reading theory constraints from "+ self.outputFile
 
