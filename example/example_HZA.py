@@ -3,7 +3,10 @@
 
 import math
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import numpy as np
 
 mode = 'H'
 sqrts = 13000
@@ -30,6 +33,8 @@ test.computeBR()
 
 xsec =  test.getXsecFromSusHi()
 
+xsec = np.asarray(xsec)
+
 mA_list = [] 
 xsectot_list = []
 HtoZABR_list = []
@@ -40,7 +45,8 @@ while mA < mH-90:
     test.computeBR()
     print "ZA BR", test.HtoZABR
     mA_list.append(mA)
-    xsectot_list.append(xsec*test.HtoZABR*test.AtobbBR*0.067)
+    xsec_times_BR = xsec*test.HtoZABR*test.AtobbBR*0.067
+    xsectot_list.append(xsec_times_BR)
     HtoZABR_list.append(test.HtoZABR)
     AtobbBR_list.append(test.AtobbBR)
     mA+=2
