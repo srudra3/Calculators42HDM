@@ -2,6 +2,7 @@
 import subprocess
 import sys
 import linecache
+import math
 import os
 
 class Calc2HDM:
@@ -109,7 +110,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
 
     def setsba(self, sba) :
         self.sba = sba
-
+    
     def setmH(self, M) :
         self.mH = M
 
@@ -137,12 +138,15 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
     def getXsecFromSusHi(self) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
+        #cba = math.sqrt(1-self.sba*self.sba)
+        b = math.atan(self.tb)
         sushiCardName = (
             str(self.mH).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.mA).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.muF).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.muR).replace('.', 'p').replace('-', 'm') + 
             "_" + str(self.tb).replace('.', 'p').replace('-', 'm') +
+            "_" + str(self.sba)[:5].replace('.', 'p').replace('-', 'm') +
             "_" + str(self.pdf)) # keep the dots in the pdf name
         sushiInputCardPath = "Scan/" + sushiCardName + ".in"
         sushiOutputCardPath = "Scan/" + sushiCardName + ".out"
@@ -163,6 +167,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             'SQRTS':str(self.sqrts),
             'CUSTOMPDFNNLO':str(self.pdf)
             }
+
 #        print replacements
         with open(sushiDefaultCardPath) as f1:
             with open(sushiInputCardPath,'w') as f2:
@@ -187,23 +192,26 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         Xsec = None
         # extracting xsec from the output file
         with open(os.path.join(pwd, sushiOutputCardPath),'r') as f:
-            Xsec = 0 # ggh XS in pb
             integerror = 0 # +/- integ. error: ggh XS in pb
             muRm = 0 # - from muR variation: ggh XS in pb
             muRp = 0 # + from muR variation: ggh XS in pb
+            Xsec_gg = 0 # ggh XS in pb
+            ##Xsec_bb = 0 # bbh XS in pb
             for line in f:
-                if 'ggh XS in pb' not in line:
-                    continue
-                if ' 1 ' in line:
-                    Xsec = line.split()[1]
-                elif ' 101 ' in line:
-                    integerror = line.split()[1]
-                elif ' 102 ' in line:
-                    muRm = line.split()[1]
-                elif ' 103 ' in line:
-                    muRp = line.split()[1]
-        return float(Xsec), float(integerror), float(muRm), float(muRm)
-
+                if 'ggh XS in pb' in line:
+                    if ' 1 ' in line:
+                        Xsec_gg = line.split()[1]
+                    elif ' 101 ' in line:
+                        integerror = line.split()[1]
+                    elif ' 102 ' in line:
+                        muRm = line.split()[1]
+                    elif ' 103 ' in line:
+                        muRp = line.split()[1]
+                # Uncomment to produce the bbh cross section
+                ##if 'bbh XS in pb' in line:
+                ##    if ' 1 ' in line:
+                ##        Xsec_bb = line.split()[1]
+        return float(Xsec_gg), float(integerror), float(muRm), float(muRm)
 
 
     def computeBR(self):
