@@ -11,8 +11,8 @@ mode = 'H'
 sqrts = 13000
 type = 2
 mh = 125
-MH = 500 
-MA = 200
+MH = 379
+MA = 172
 outputFile = "out_tb_cba.dat"
 ZtollBR =  3.3658 * 2 / 100. # no taus
 
@@ -31,14 +31,13 @@ def float_to_str(x, digits=2):
     tmp = ('{' + tmp + '}').format(x)
     return tmp.replace('.', 'p')
 
-for tb_exponent in np.arange(-2, 3, 1):
-    for tb_coeff in np.arange(0.001, 10, 1):
-        tb = tb_coeff * pow(10, tb_exponent)
-        for cba in np.arange(-0.99, 0.99, 0.02):
-            ta = math.tan(math.atan(tb) - math.acos(cba))
-            if ta < 0:
-                continue
-            sba = math.sqrt(1 - pow(cba, 2))
+for tb in np.arange(0.01, 20.1, 0.3):
+        for ba in np.arange(0.13, math.pi, 0.05):
+            cba = math.cos(ba)
+            if ba >= 0 and ba <= math.pi/2:
+                sba = math.sin(ba)
+            elif ba > math.pi/2 and ba <= math.pi:
+                sba = math.sin(ba-math.pi)
             mhc = max(MH, MA)
             m12 = math.sqrt(pow(mhc, 2) * tb / (1 + pow(tb, 2)))
             x = Calc2HDM(mode = 'H', sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = MH, mA = MA, mhc = mhc, sba = sba, outputFile = outputFile, muR = 1., muF = 1.)
