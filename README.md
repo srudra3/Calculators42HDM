@@ -1,16 +1,8 @@
-# Keep An Eye To The Latest Versions : 
-- [2HDMC](https://2hdmc.hepforge.org)
-- [SUSHI](https://sushi.hepforge.org/)
-- [LHAPDF](https://lhapdf.hepforge.org/index.html)
 
-- NOT NECESSARY TO WORK WITH 2HDMC 
-- [HiggsBounds](http://higgsbounds.hepforge.org)
-- [HiggsSignals](http://higgsbounds.hepforge.org)
+# 2HDMC - Two-Higgs-Doublet Model Caclulators -
+2HDMC is a general-purpose calculator for the two-Higgs doublet model. It allows parametrization of the Higgs potential in many different ways, convenient specification of generic Yukawa sectors, the evaluation of decay widths (including higher-order QCD corrections), theoretical constraints and much more.
 
-# Calculators For 2HDM
-Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fractions. 
-
-    ## In a CMSSW release
+## Install in a CMSSW release:
 ```bash
     # setup your env 
     module load gcc/gcc-7.3.0-sl7_amd64 lhapdf/6.1.6-sl7_gcc73
@@ -26,7 +18,7 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
     # Setup github remotes
     source first_setup.sh
 ```
-    ## With Conda (from @pdavid) 
+## Install With Conda (from @pdavid):
 - [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 - [CONDA-FORGE](https://conda-forge.org/#page-top)
 
@@ -39,10 +31,11 @@ Tools to use SusHi and 2HDMC to compute H/A/h cross section and branching fracti
     source sushi_2hdmc_conda.sh
 ```
 
-## Run the test
-    
+## Run the test:
+    ```
     python example/test.py
-##Troubleshooting: 
+    ```
+## Trouble-Shooting: 
 ```
 lib/libsushi2HDMC.a(runthdmc.o): In function `runthdmc_':
 runthdmc.f:(.text+0x13d): undefined reference to `thdmc_set_param_'
@@ -54,4 +47,13 @@ make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
     +CFLAGS= -std=c++11 -Wall -fPIE $(DEBUG) $(OPT)
     -SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp
     +SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp runTHDM.cpp
-```
+```    
+
+## Keep an eye on the latest versions: 
+- [2HDMC](https://2hdmc.hepforge.org)
+- [SUSHI](https://sushi.hepforge.org/)
+- [LHAPDF](https://lhapdf.hepforge.org/index.html)
+- It can also be useful to download HiggsBounds/HiggsSignals (** optional** , Note: 2HDMC work without HB/HS), since 2HDMC can interface the LEP, Tevatron and LHC constraints implemented in these codes. HiggsBounds/HiggsSignals are available: 
+- [HiggsBounds](http://higgsbounds.hepforge.org)
+- [HiggsSignals](http://higgsbounds.hepforge.org)
+
