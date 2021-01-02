@@ -276,8 +276,9 @@ for plot in plots:
     
     xmin = 0.01 if plot == 'func_of_tb' else -1.
     xmax = 20.1 if plot == 'func_of_tb' else  1.
-    ymin = 0.00001
-    ymax = 10. #
+    # BR
+    ymin = 0.000000001
+    ymax = 10.
 
     #CMSStyle.changeFont()
     npoints = len(x)
@@ -293,20 +294,20 @@ for plot in plots:
        colA = 1
     #First subplot
     print (rowH,colH,rowA,colA)
-    axs[rowH,colH].plot(x, y_HtoZA, 'red', label='ZA', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_HtoZga, 'violet', label=r'Z$\gamma$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htobb, 'purple', label=r'b$\bar{b}$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htocc, 'blueviolet', label=r'c$\bar{c}$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htoss, 'deeppink', label=r's$\bar{s}$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htoee, 'darkred', label=r'$e^+e^-$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htomumu, 'navy', label=r'$\mu^+\mu^-$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htohh, 'darkgoldenrod',label='hh', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_HtoWW, 'green', label='WW', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_HtoZZ, 'lightskyblue', label='ZZ', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htott, 'mediumblue', label=r't$\bar{t}$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htotautau, 'palevioletred', label=r'$\tau \tau$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htogg, 'lime', label=r'$\gamma \gamma$', linewidth=2.0)
-    axs[rowH,colH].plot(x, y_Htogluglu, 'aqua', label='gg', linewidth=2.0)
+    axs[rowH,colH].plot(x, y_HtoZA, 'red', label='ZA', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_HtoZga, 'violet', label=r'Z$\gamma$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htobb, 'purple', label=r'b$\bar{b}$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htocc, 'blueviolet', label=r'c$\bar{c}$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htoss, 'deeppink', label=r's$\bar{s}$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htoee, 'darkred', label=r'$e^+e^-$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htomumu, 'navy', label=r'$\mu^+\mu^-$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htohh, 'darkgoldenrod',label='hh', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_HtoWW, 'green', label='WW', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_HtoZZ, 'lightskyblue', label='ZZ', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htott, 'mediumblue', label=r't$\bar{t}$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htotautau, 'palevioletred', label=r'$\tau \tau$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htogg, 'lime', label=r'$\gamma \gamma$', linewidth=2.5)
+    axs[rowH,colH].plot(x, y_Htogluglu, 'aqua', label='gg', linewidth=2.5)
     axs[rowH,colH].xaxis.set_tick_params(which='both', labelbottom=False, labeltop=False)
     axs[rowH,colH].xaxis.offsetText.set_visible(False)
 
@@ -320,9 +321,9 @@ for plot in plots:
     #if plot == "func_of_tb":
     #    axs[rowH,colH].legend(loc='center right', bbox_to_anchor=(1.33, 0.5), prop={'size': 30}, frameon=False)
     if plot == "func_of_tb":
-        axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H=300$ GeV, $m_A=200$ GeV, $cos(\beta-\alpha) = 0.01$".format('II' if options.type==2 else('I')), fontsize=24, color='black', transform=axs[rowH,colH].transAxes)
+        axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H=300$ GeV, $m_A=200$ GeV, $cos(\beta-\alpha) = 0.01$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
     else:
-        axs[rowH,colH].text(0.11,  1.02, r"2HDM-Type{}: $m_H=300$ GeV, $m_A=200$ GeV, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=24, color='black', transform=axs[rowH,colH].transAxes)
+        axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H=300$ GeV, $m_A=200$ GeV, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
 
     #Second subplot
 
@@ -336,7 +337,7 @@ for plot in plots:
     axs[rowA,colA].plot(x, y_Atotautau, 'palevioletred', label=r'$\tau \tau$', linewidth=2.5)
     axs[rowA,colA].plot(x, y_Atogg, 'lime', label=r'$\gamma \gamma$',          linewidth=2.5)
     axs[rowA,colA].plot(x, y_Atogluglu, 'aqua', label='gg',                    linewidth=2.5)
-    axs[rowA,colA].axis([xmin, xmax, 0.001, ymax])
+    axs[rowA,colA].axis([xmin, xmax, 0.000000001, ymax])
     if options.logy:
         axs[rowA,colA].set_yscale('log')
     
@@ -356,12 +357,12 @@ for plot in plots:
         #ticks = np.arange(-1, 1.01, 0.5)
         #axs[rowA,colA].set_xticks(ticks, minor=False)
 
-    plt.setp(axs[rowH,colH].get_xticklabels(), fontsize=30)
-    plt.setp(axs[rowH,colH].get_yticklabels(), fontsize=30)
+    plt.setp(axs[rowH,colH].get_xticklabels(), fontsize=24)
+    plt.setp(axs[rowH,colH].get_yticklabels(), fontsize=24)
     labelLines(axs[rowH,colH].get_lines(),align=False,fontsize=18)
     
-    plt.setp(axs[rowA,colA].get_xticklabels(), fontsize=30)
-    plt.setp(axs[rowA,colA].get_yticklabels(), fontsize=30)
+    plt.setp(axs[rowA,colA].get_xticklabels(), fontsize=24)
+    plt.setp(axs[rowA,colA].get_yticklabels(), fontsize=24)
     labelLines(axs[rowA,colA].get_lines(),align=False,fontsize=18)
     
     if plot == "func_of_cba":
@@ -369,8 +370,10 @@ for plot in plots:
     else:
         axs[rowA,colA].set_xlabel(r'tan$\beta$', fontsize=26, horizontalalignment='right', x=0.56)
     axs[rowH,colH].set_ylabel(r'BR($H \to XX$)', fontsize=26, horizontalalignment='right', y=1.0)
+    axs[rowH,colH].grid()
     #axs[rowH,colH].set_yscale('log')
     axs[rowA,colA].set_ylabel(r'BR($A \to XX$)', fontsize=26, horizontalalignment='right', y=1.0)
+    axs[rowA,colA].grid()
     #axs[rowA,colA].set_yscale('log')
     #if plot == "func_of_tb":
     #    axs[0].set_xscale('log')
