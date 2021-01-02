@@ -12,13 +12,13 @@
     git cms-init
 
     # Get and execute the install script
-    wget https://raw.githubusercontent.com/cp3-llbb/Calculators42HDM/master/sushi_2hdmc_cmssw.sh
+    wget https://github.com/kjaffel/Calculators42HDM/master/sushi_2hdmc_cmssw.sh
     source sushi_2hdmc_cmssw.sh
 
     # Setup github remotes
     source first_setup.sh
 ```
-## Install With Conda (from @pdavid):
+## Install With Conda (from [@pdavid](https://github.com/pieterdavid)):
 - [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 - [CONDA-FORGE](https://conda-forge.org/#page-top)
 
@@ -27,14 +27,14 @@
     conda create -n SusHi170 gsl gfortran_linux-64 gxx_linux-64 gcc_linux-64
     conda activate SusHi170
 
-    wget https://raw.githubusercontent.com/cp3-llbb/Calculators42HDM/master/sushi_2hdmc_conda.sh
+    wget https://github.com/kjaffel/Calculators42HDM/master/sushi_2hdmc_conda.sh
     source sushi_2hdmc_conda.sh
 ```
 
 ## Run the test:
-    ```
+   
     python example/test.py
-    ```
+ 
 ## Trouble-Shooting: 
 ```
 lib/libsushi2HDMC.a(runthdmc.o): In function `runthdmc_':
@@ -43,10 +43,10 @@ collect2: error: ld returned 1 exit status
 make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 ```
 ```
-    -CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT)
-    +CFLAGS= -std=c++11 -Wall -fPIE $(DEBUG) $(OPT)
-    -SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp
-    +SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp runTHDM.cpp
+  -CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT)
+  +CFLAGS= -std=c++11 -Wall -fPIE $(DEBUG) $(OPT)
+  -SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp
+  +SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp runTHDM.cpp
 ```    
 
 ## Keep an eye on the latest versions: 
@@ -56,4 +56,3 @@ make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 - It can also be useful to download HiggsBounds/HiggsSignals (** optional** , Note: 2HDMC work without HB/HS), since 2HDMC can interface the LEP, Tevatron and LHC constraints implemented in these codes. HiggsBounds/HiggsSignals are available: 
 - [HiggsBounds](http://higgsbounds.hepforge.org)
 - [HiggsSignals](http://higgsbounds.hepforge.org)
-
