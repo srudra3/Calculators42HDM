@@ -32,7 +32,8 @@ class Calc2HDM:
         self.muR = muR
         self.muF = muF
         self.BRcomputed = 0
-        self.pdf = "CT10nnlo.LHgrid" 
+        #self.pdf = "CT10nnlo.LHgrid" 
+        self.pdf= "NNPDF31_nnlo_as_0118_mc_hessian_pdfas"
         self.lambda_1 = 0
         self.lambda_2 = 0
         self.lambda_3 = 0
@@ -55,6 +56,26 @@ class Calc2HDM:
         self.htobbBR = 0
         self.AtobbBR = 0
 
+        self.HtossBR = 0
+        self.htossBR = 0
+        self.AtossBR = 0
+        
+        self.HtoccBR = 0
+        self.htoccBR = 0
+        self.AtoccBR = 0
+        
+        self.HtoeeBR = 0
+        self.htoeeBR = 0
+        self.AtoeeBR = 0
+
+        self.HtomumuBR = 0
+        self.htomumuBR = 0
+        self.AtomumuBR = 0
+        
+        self.HtoZgaBR = 0
+        self.htoZgaBR = 0
+        self.AtoZgaBR = 0
+        
         self.HtoZhBR = 0
         self.AtoZhBR = 0
 
@@ -146,11 +167,16 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             "_" + str(self.muF).replace('.', 'p').replace('-', 'm') +
             "_" + str(self.muR).replace('.', 'p').replace('-', 'm') + 
             "_" + str(self.tb).replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.sba)[:5].replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.pdf)) # keep the dots in the pdf name
-        sushiInputCardPath = "Scan/" + sushiCardName + ".in"
-        sushiOutputCardPath = "Scan/" + sushiCardName + ".out"
-     
+            "_" + str(self.sba)[:5].replace('.', 'p').replace('-', 'm') 
+            )#+ "_" + str(self.pdf)) # keep the dots in the pdf name
+        sushiInputCardPath = "Scan/"+ str(self.pdf) +'/' + sushiCardName + ".in"
+        sushiOutputCardPath = "Scan/" + str(self.pdf) +'/'+ sushiCardName + ".out"
+        sushiInputCardPath_1 = sushiCardName + ".in"
+        sushiOutputCardPath_1 = sushiCardName + ".out"
+        
+        path_tosushi_output_cards="Scan/"+ str(self.pdf)
+        if not os.path.exists(path_tosushi_output_cards):
+            os.makedirs(path_tosushi_output_cards)
         # Replacements of variables into the input file
         replacements = {
             'MODE':str(self.mode),
@@ -179,45 +205,57 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
      
         #running SusHi
         pwd = os.getcwd()
-        run_sushi = ["./SusHi-1.6.1/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
+        os.chdir(os.path.join(pwd, path_tosushi_output_cards ))
+        print( os.path.join(pwd, path_tosushi_output_cards )) 
+        run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiInputCardPath_1, sushiOutputCardPath_1]
+        print( " ".join(run_sushi) )
         if not os.path.isfile(sushiOutputCardPath):
-            print ' '.join(run_sushi)
-            log = sushiOutputCardPath.replace('out', 'log')
-            with open(log, 'w') as f:
-                p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=pwd)
-                p.communicate() # wait until process finishes
+            try:
+                subprocess.check_call( " ".join(run_sushi), shell=True)
+            except subprocess.CalledProcessError as error:
+                print error
         else:
             print '# SusHi was run already, looking for results in %s' % sushiOutputCardPath
-     
+        
+        os.chdir(pwd)
         Xsec = None
         # extracting xsec from the output file
         with open(os.path.join(pwd, sushiOutputCardPath),'r') as f:
-            integerror = 0 # +/- integ. error: ggh XS in pb
-            muRm = 0 # - from muR variation: ggh XS in pb
-            muRp = 0 # + from muR variation: ggh XS in pb
+            integerror_gg = 0 # +/- integ. error: ggh XS in pb
+            muRm_gg = 0 # - from muR variation: ggh XS in pb
+            muRp_gg = 0 # + from muR variation: ggh XS in pb
             Xsec_gg = 0 # ggh XS in pb
-            ##Xsec_bb = 0 # bbh XS in pb
+            
+            integerror_bb = 0 # +/- integ. error: ggh XS in pb
+            muRm_bb = 0 # - from muR variation: ggh XS in pb
+            muRp_bb = 0 # + from muR variation: ggh XS in pb
+            Xsec_bb = 0 # bbh XS in pb
             for line in f:
                 if 'ggh XS in pb' in line:
                     if ' 1 ' in line:
                         Xsec_gg = line.split()[1]
                     elif ' 101 ' in line:
-                        integerror = line.split()[1]
+                        integerror_gg = line.split()[1]
                     elif ' 102 ' in line:
-                        muRm = line.split()[1]
+                        muRm_gg = line.split()[1]
                     elif ' 103 ' in line:
-                        muRp = line.split()[1]
-                # Uncomment to produce the bbh cross section
-                ##if 'bbh XS in pb' in line:
-                ##    if ' 1 ' in line:
-                ##        Xsec_bb = line.split()[1]
-        return float(Xsec_gg), float(integerror), float(muRm), float(muRm)
+                        muRp_gg = line.split()[1]
+                if 'bbh XS in pb' in line:
+                    if ' 1 ' in line:
+                        Xsec_bb = line.split()[1]
+                    elif ' 101 ' in line:
+                        integerror_bb = line.split()[1]
+                    elif ' 102 ' in line:
+                        muRm_bb = line.split()[1]
+                    elif ' 103 ' in line:
+                        muRp_bb = line.split()[1]
+        return float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRm_gg), float(Xsec_bb), float(integerror_bb), float(muRm_bb), float(muRm_bb)
 
 
     def computeBR(self):
 
         pwd = os.getcwd()
-        command = ["./2HDMC-1.7.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
+        command = ["./2HDMC-1.8.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
         outputExists = False # FIXME: default output is out.dat, not really bug-proof...
         # outputExists = os.path.isfile(self.outputFile)
         if not outputExists:
@@ -277,8 +315,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     elif modeh == 1 :
                         self.htoZABR = float(ZABRLine3)
     
-                  #print "BR ZA", ZABR,
-            
                 elif "23    35" in line and modeA == 1 :
                     ZHBRLine2 = line.replace("       ","")
                     ZHBRLine3 = ZHBRLine2.replace("     2      23    35","")
@@ -293,14 +329,65 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     elif modeh == 1 :
                         self.htoAABR = float(AABRLine3)
     
-                    #print "BR ZA", ZABR,
             
                 elif "35    35" in line and modeH == 1 :
                   HHBRLine2 = line.replace("       ","")
                   HHBRLine3 = HHBRLine2.replace("     2      35    35","")
                   self.AtoHHBR = float(HHBRLine3)
+
+                elif "3    -3" in line :
+                  ssBRLine2=line.replace("     2       3    -3","")
+                  ssBRLine3 = ssBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtossBR = float(ssBRLine3)
+                  elif modeA == 1 :
+                    self.AtossBR = float(ssBRLine3)
+                  elif modeh == 1 :
+                    self.htossBR = float(ssBRLine3)
             
-            
+
+                elif "4    -4" in line :
+                  ccBRLine2=line.replace("     2       4    -4","")
+                  ccBRLine3 = ccBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoccBR = float(ccBRLine3)
+                  elif modeA == 1 :
+                    self.AtoccBR = float(ccBRLine3)
+                  elif modeh == 1 :
+                    self.htoccBR = float(ccBRLine3)
+
+
+                elif "11    -11" in line :
+                  eeBRLine2=line.replace("     2      11   -11","")
+                  eeBRLine3 = eeBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoeeBR = float(eeBRLine3)
+                  elif modeA == 1 :
+                    self.AtoeeBR = float(eeBRLine3)
+                  elif modeh == 1 :
+                    self.htoeeBR = float(eeBRLine3)
+
+                elif "13    -13" in line :
+                  mumuBRLine2=line.replace("     2      13   -13","")
+                  mumuBRLine3 = mumuBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtomumuBR = float(mumuBRLine3)
+                  elif modeA == 1 :
+                    self.AtomumuBR = float(mumuBRLine3)
+                  elif modeh == 1 :
+                    self.htomumuBR = float(mumuBRLine3)
+
+                elif "23    22" in line :
+                  ZgaBRLine2=line.replace("     2      23    22","")
+                  ZgaBRLine3 = ZgaBRLine2.replace("       ","")
+                  if modeH == 1 :
+                    self.HtoZgaBR = float(ZgaBRLine3)
+                  elif modeA == 1 :
+                    self.AtoZgaBR = float(ZgaBRLine3)
+                  elif modeh == 1 :
+                    self.htoZgaBR = float(ZgaBRLine3)
+
+                
                 elif "5    -5" in line :
                   bbBRLine2 = line.replace("     2       5    -5","")
                   bbBRLine3 = bbBRLine2.replace("       ","")
@@ -339,7 +426,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtotautauBR = float(tautauBRLine3)
                   elif modeh == 1 :
                     self.htotautauBR = float(tautauBRLine3)
-                  #print "BR tautau", tautauBR
             
                 elif "25    25" in line :
                   hhBRLine2 = line.replace("     2      25    25","")
@@ -348,7 +434,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.HtohhBR = float(hhBRLine3)
                   elif modeA == 1 :
                     self.AtohhBR = float(hhBRLine3)
-                  #print "BR hh", hhBR
             
                 elif "23    23" in line :
                   ZZBRLine2 = line.replace("     2      23    23","")
@@ -359,7 +444,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoZZBR = float(ZZBRLine3)
                   elif modeh == 1 :
                     self.htoZZBR = float(ZZBRLine3)
-                  #print "BR ZZ", ZZBR
             
                 elif "24   -24" in line :
                   WWBRLine2 = line.replace("     2      24   -24","")
