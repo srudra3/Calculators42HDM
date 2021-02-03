@@ -290,7 +290,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         modeh=0
         modeH=0
         modeA=0
-      
+        modeHc=0  
         with open(self.outputFile) as f:
             for line in f:
                 if "DECAY  25" in line :
@@ -311,8 +311,10 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                 elif "DECAY  37" in line :
                     self.chargedHwidth = float(line.split()[2])
                     modeh = 0
-                    modeA = 1
+                    modeA = 0
                     modeH = 0
+                    modeHc = 1
+
                 elif "23    36" in line :
                     ZABRLine2 = line.replace("       ","")
                     ZABRLine3 = ZABRLine2.replace("     2      23    36","")

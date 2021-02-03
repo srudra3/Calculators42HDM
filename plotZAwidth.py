@@ -170,8 +170,8 @@ def Calculators42HDM(list_masses, list_tb, return_scaledXSC= False, return_total
         xsec_times_BR[tb]= results2
         xsec[tb]= results3
         print (80*'*')
-    mass_rng = 'from{}to{}'.float( float_to_str(list_masses.min(), 2), float_to_str(list_masses.max(), 2))
-    tb_rng = 'from{}to{}'.float( float_to_str(list_tb.min(), 2), float_to_str(list_tb.max(), 2))
+    mass_rng = 'from{}to{}'.format( float_to_str(list_masses.min(), 2), float_to_str(list_masses.max(), 2))
+    tb_rng = 'from{}to{}'.format( float_to_str(list_tb.min(), 2), float_to_str(list_tb.max(), 2))
     json_Totalwidth='totalwidth_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
     json_Totalxsc='totalxsc_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
     json_TotalxscXbr='totalxscXbr_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
