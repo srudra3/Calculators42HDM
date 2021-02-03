@@ -14,15 +14,12 @@ if version.parse(mpl.__version__) >= version.parse('2.0.0'):
     mpl.rcParams['grid.color'] = 'k'
     mpl.rcParams['grid.linestyle'] = 'dotted'
     mpl.rcParams['grid.linewidth'] = 0.5
-
     mpl.rcParams['figure.figsize'] = [8.0, 6.0]
     mpl.rcParams['figure.dpi'] = 80
     mpl.rcParams['savefig.dpi'] = 100
-
     #mpl.rcParams['font.size'] = 12
     mpl.rcParams['legend.fontsize'] = 35 #'large'
     mpl.rcParams['figure.titlesize'] = 'medium'
-
     mpl.rcParams['lines.linewidth'] = 1.0
     mpl.rcParams['lines.dashed_pattern'] = [6, 6]
     mpl.rcParams['lines.dashdot_pattern'] = [3, 5, 1, 5]
@@ -43,9 +40,8 @@ import logging
 LOG_LEVEL = logging.DEBUG
 LOGFORMAT = "  %(log_color)s%(levelname)-8s%(reset)s | %(log_color)s%(message)s%(reset)s"
 import colorlog
-from colorlog import ColoredFormatter
 logging.root.setLevel(LOG_LEVEL)
-formatter = ColoredFormatter(LOGFORMAT)
+formatter = colorlog.ColoredFormatter(LOGFORMAT)
 stream = logging.StreamHandler()
 stream.setLevel(LOG_LEVEL)
 stream.setFormatter(formatter)
@@ -227,8 +223,7 @@ def ZABR(type2hdm= 2, func_of_cba=False, func_of_tb=False, func_of_mA=False, fun
 
 
 def MakeBRPlots( plots=[] ): 
-    plt.rc('axes', labelsize=23)
-    plt.rc('axes', titlesize=23)
+    plt.rc('axes', labelsize=23, titlesize=23)
     fig, axs = plt.subplots(2, 2, figsize=(23, 15), dpi=300, gridspec_kw={'height_ratios': [1.3, 1]})
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.27, hspace=None)
     for plot in plots:
@@ -250,7 +245,7 @@ def MakeBRPlots( plots=[] ):
         y_AtoZh = []
 
         if options.lazy:
-            input_files = {'func_of_cba':'BR_mH-300p00_mA-200p00_2hdmtype-2_tb-1p50_function_of_cba.json', 
+            input_files = {'func_of_cba': 'BR_mH-300p00_mA-200p00_2hdmtype-2_tb-1p50_function_of_cba.json', 
                             'func_of_tb': 'BR_mH-300p00_mA-200p00_2hdmtype-2_cba-0p01_function_of_tb.json',
                             'func_of_mA': 'BR_2hdmtype-2_tb-1p50_cba-0p01_function_of_mA.json',
                             'func_of_mH': 'BR_2hdmtype-2_tb-1p50_cba-0p01_function_of_mH.json'
@@ -332,7 +327,6 @@ def MakeBRPlots( plots=[] ):
         ymin = 0.000000001
         ymax = 10.
     
-    
         #CMSStyle.changeFont()
         npoints = len(x)
         if plot == "func_of_cba" or plot == 'func_of_mA':
@@ -368,7 +362,7 @@ def MakeBRPlots( plots=[] ):
         axs[rowH,colH].axis([xmin, xmax, ymin, ymax])
         if options.logy:
             axs[rowH,colH].set_yscale('log')
-        if plot == "func_of_tb" and options.logy:
+        if plot in ["func_of_tb", "func_of_mH", "func_of_mA"] and options.logy:
             axs[rowH,colH].set_xscale('log')
         
         #if plot == "func_of_tb":
@@ -380,7 +374,7 @@ def MakeBRPlots( plots=[] ):
         elif plot == "func_of_mA":
             axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H= m_Z + m_A$, $cos(\beta-\alpha) = 0.01$, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
         elif plot == "func_of_mH":
-            axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_A= m_H - m_Z$ GeV, $cos(\beta-\alpha) = 0.01$, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
+            axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_A= m_H - m_Z$, $cos(\beta-\alpha) = 0.01$, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
         #Second subplot
     
         axs[rowA,colA].plot(x, y_AtoZh, 'darkslategray', label='Zh',               linewidth=2.5)
@@ -397,11 +391,9 @@ def MakeBRPlots( plots=[] ):
     
         if options.logy:
             axs[rowA,colA].set_yscale('log')
-        
-        if plot in ["func_of_tb", "func_of_mH", "func_of_mA"] and options.logy:
+        if plot in ["func_of_tb"] and options.logy:
             axs[rowA,colA].set_xscale('log')
         
-
         if plot == "func_of_cba":
             majorLocator   = MultipleLocator(0.5)
             majorFormatter = FormatStrFormatter('%.1f')
@@ -457,4 +449,5 @@ plots = [
     ]
 MakeBRPlots( plots=plots)
 if options.scan:
-    MakeBRPlots( plots=['func_of_mA', 'func_of_mH'])
+    addplots = ['func_of_mA', 'func_of_mH']
+    MakeBRPlots( plots=addplots)
