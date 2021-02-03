@@ -43,6 +43,7 @@ class Calc2HDM:
         self.lambda_7 = 0
         #initializing all BRs
         self.Hwidth = 0
+        self.chargedHwidth = 0
         self.hwidth = 0
         self.Awidth = 0
          
@@ -249,7 +250,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                         muRm_bb = line.split()[1]
                     elif ' 103 ' in line:
                         muRp_bb = line.split()[1]
-        return float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRm_gg), float(Xsec_bb), float(integerror_bb), float(muRm_bb), float(muRm_bb)
+        return float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRp_gg), float(Xsec_bb), float(integerror_bb)
 
 
     def computeBR(self):
@@ -304,6 +305,11 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     modeA = 0
                 elif "DECAY  36" in line :
                     self.Awidth = float(line.split()[2])
+                    modeh = 0
+                    modeA = 1
+                    modeH = 0
+                elif "DECAY  37" in line :
+                    self.chargedHwidth = float(line.split()[2])
                     modeh = 0
                     modeA = 1
                     modeH = 0
