@@ -28,7 +28,9 @@ test = Calc2HDM(mode = 'H', sqrts = sqrts, type = type, tb = tb, m12 = m12, mh =
 test.computeBR()
 
 xsec_ggh, err_integration_ggh, err_muRm_ggh, err_muRp_ggh, xsec_bbh, err_integration_bbh =  test.getXsecFromSusHi()
+print ( '1:', xsec_ggh )
 xsec_ggh = np.asarray(xsec_ggh)
+print ( '2:', xsec_ggh )
 xsec_bbh = np.asarray(xsec_bbh)
 
 mA_list = [] 

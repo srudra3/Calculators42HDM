@@ -99,7 +99,13 @@ def Calculators42HDM(list_masses, list_tb, return_scaledXSC= False, return_total
             'mH':[],
             'mA':[]
             }
-        results3 = results2
+        results3 = {
+            'gg-fusion':[],
+            'bb-associated_production':[],
+            'mH':[],
+            'mA':[]
+            }
+
         for m in list_masses:
             if options.scan =="mA":
                 mA = m
@@ -295,36 +301,36 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.27, hspace=None)
     
     if options.lazy:
-        jsonfile=( 'totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json' if options.scale else('totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'))
+        #jsonfile=( 'totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json' if options.scale else('totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'))
+        jsonfile=( 'totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json' if options.scale else('totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json'))
     else:
         jsonfile= Calculators42HDM(M, TANbeta, return_scaledXSC = options.scale , return_totalwidth= False)
 
     with open(jsonfile) as f:
         data = json.load(f)
-    #sorted_json = json.dumps(dict_data, sort_keys=True)
-    #with open(sorted_json) as f:
-    #    sorted_data = json.load(f)
     x_axis =[]
     y_axis =[]
     z1_axis=[]
     z2_axis=[]
-   
-    for k, v in data.items():
-        x= data[k][options.scan]
-        y = [float(k)]*108
-        z1_xsc_gg=data[k]['gg-fusion']
-        z2_xsc_bb=data[k]['bb-associated_production']
-       
+    
+    print( sorted( float(k) for k in data.keys()) )
+    for k in sorted( float(k) for k in data.keys()):
+        x= data[str(k)][options.scan]
+        print( x )
+        y = [k]*len(x)
+        z1_xsc_gg=data[str(k)]['gg-fusion']
+        z2_xsc_bb=data[str(k)]['bb-associated_production']
         x_axis.append( x)
         y_axis.append( y)
         z1_axis.append(z1_xsc_gg)
         z2_axis.append(z2_xsc_bb)
-         
-    print( max(range(len(z1_axis))), max(range(len(z1_axis)), key=z1_axis.__getitem__))
+    print( 'y len:', len(y_axis), 'x len:', len(x_axis))     
+    #print( max(range(len(z1_axis))), max(range(len(z1_axis)), key=z1_axis.__getitem__))
     new_x = np.asarray(x_axis)
     new_y = np.asarray(y_axis)
     z1 = np.asarray(z1_axis)
     z2 = np.asarray(z2_axis)
+    print( new_x)
     if interploate:
         interp_x = np.arange(new_x.min(), new_x.max(), 10.)
         interp_y = np.arange(new_y.min(), new_x.max(), 0.1)
@@ -345,13 +351,13 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     from matplotlib.ticker import LogFormatter 
     import matplotlib.colors as colors
     
-    axs1.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, m12= 0., mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
+    axs1.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
     axs1.set_xlabel('{} [GeV]'.format(options.scan.upper()), horizontalalignment='center',fontsize=18)
     axs1.set_ylabel( r'$tan\beta$', horizontalalignment='right', fontsize=18)
     #axs1.xaxis.set_ticks(M)
-    #axs1.yaxis.set_ticks(np.arange(0.5, 19.5, 0.5))
+    #axs1.yaxis.set_ticks(TANBETA)
     axs1.set_xlim([xmin, xmax])
-    axs1.set_ylim([0.5, 19.5])
+    axs1.set_ylim([new_y.min(), new_y.max()])
     #axs1.set_xscale('log')
     #axs1.set_yscale('log')
     
@@ -360,31 +366,39 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     cmap = plt.get_cmap('jet')
     levels = MaxNLocator(nbins=15).tick_values(z1.min(), z1.max())
     #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
-    print( z1.min(), z1.max())
-    print( z1 )
-    im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.LogNorm(vmin = z1.min(), vmax = z1.max()))
-    #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z1.min(), vmax = z1.max()))
+    #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.LogNorm(vmin = z1.min(), vmax = z1.max()))
+    im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z1.min(), vmax = z1.max()))
     divider = make_axes_locatable(axs1)
     cax1 = divider.append_axes("right", size="5%", pad=0.05)
     #cax1.set_xticks(new_x)
     #cax1.set_yticks(new_y)
-    fig.colorbar(im1, cax=cax1, label=r'$\sigma(gg fusion)* BR(H\rightarrow ZA)* BR\rightarrow bb)$')
-    
-    axs2.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, m12= 0., mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
+    cbar1 = plt.colorbar(im1, cax=cax1)
+    if options.scale: 
+        cbar1.set_label(label=r'$\sigma$ (gg fusion)* BR(H $\rightarrow$ ZA)* BR(A $\rightarrow$ bb~) [pb]$', size=18)
+    else:
+        cbar1.set_label(label=r'$\sigma$ (gg fusion) [pb]', size=18)
+    #cbar.ax.tick_params(labelsize=18)
+
+    axs2.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
     axs2.set_xlabel('{} [GeV]'.format(options.scan.upper()), horizontalalignment='center', fontsize=18)
     axs2.set_ylabel( r'$tan\beta$', horizontalalignment='right', fontsize=18)
     axs2.set_xlim([xmin, xmax])
-    axs2.set_ylim([0.5, 19.5])
+    axs2.set_ylim([new_y.min(), new_y.max()])
     
+    #im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
     im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z2.min(), vmax = z2.max()))
     divider = make_axes_locatable(axs2)
     cax2 = divider.append_axes("right", size="5%", pad=0.05)
-    fig.colorbar(im2, cax=cax2, label =r'$\sigma(bb associated production)* BR(H\rightarrow ZA)* BR(\rightarrow bb)$')
+    cbar2 = plt.colorbar(im2, cax=cax2)
+    if options.scale:
+        cbar2.set_label(label =r'$\sigma$ (bb associated production)* BR(H $\rightarrow$ ZA)* BR(A $\rightarrow$ bb~) [pb]$', size=18)
+    else:
+        cbar2.set_label(label =r'$\sigma$ (bb associated production) [pb]',size=18)
+    #cbar.ax.tick_params(labelsize=18)
     
-    #fig.tight_layout()
-    fig.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.png".format(options.scan))
-    fig.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.pdf".format(options.scan))
-
+    #plt.tight_layout()
+    plt.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.png".format(options.scan))
+    plt.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.pdf".format(options.scan))
     plt.grid()
     plt.gcf().clear()
     return fig

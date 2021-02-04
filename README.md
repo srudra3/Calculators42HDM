@@ -36,13 +36,14 @@
     python example/test.py
  
 ## Trouble-Shooting: 
-```
+
+```bash
 lib/libsushi2HDMC.a(runthdmc.o): In function `runthdmc_':
 runthdmc.f:(.text+0x13d): undefined reference to `thdmc_set_param_'
 collect2: error: ld returned 1 exit status
 make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 ```
-```
+```bash
   -CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT)
   +CFLAGS= -std=c++11 -Wall -fPIE $(DEBUG) $(OPT)
   -SOURCES=THDM.cpp SM.cpp DecayTable.cpp Constraints.cpp Util.cpp
