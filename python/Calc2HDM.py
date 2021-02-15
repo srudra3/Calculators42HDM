@@ -157,7 +157,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
     def setoutputFile(self,outputFile) :
         self.outputFile=outputFile
 
-    def getXsecFromSusHi(self) :
+    def getXsecFromSusHi(self, return_xsc_byComputationOrder = False) :
      
         sushiDefaultCardPath = "default_cards/default_sushi.in"
         #cba = math.sqrt(1-self.sba*self.sba)
@@ -195,7 +195,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             'CUSTOMPDFNNLO':str(self.pdf)
             }
 
-#        print replacements
+        #print replacements
         with open(sushiDefaultCardPath) as f1:
             with open(sushiInputCardPath,'w') as f2:
                 for line in f1:
@@ -231,6 +231,26 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             muRm_bb = 0 # - from muR variation: ggh XS in pb
             muRp_bb = 0 # + from muR variation: ggh XS in pb
             Xsec_bb = 0 # bbh XS in pb
+            
+            ggh_lo= 0    # LO w/ NLO PDFs
+            ggh_nlo= 0   # NLO
+            subprocess_gg_nlo = 0  # NLO gg
+            subprocess_qg_nlo = 0  # NLO qg
+            subprocess_qq_nlo = 0  # NLO qq
+                    
+            integerror_ggh_lo = 0  # +/-: LO w/ NLO PDFs
+            integerror_ggh_nlo= 0  # +/-: NLO
+            integerror_gg_nlo = 0  # +/-: NLO gg
+            integerror_qg_nlo = 0  # +/-: NLO qg
+            integerror_qq_nlo = 0  # +/-: NLO qq
+            
+            bbh_lo =  0              # LO
+            bbh_nlo = 0              # NLO
+            bbh_nnlo = 0             # NNLO
+            integerror_bbh_lo = 0    # +/-: LO
+            integerror_bbh_nlo = 0   # +/-: NLO
+            integerror_bbh_nnlo = 0  # +/-: NNLO            
+            
             for line in f:
                 if 'ggh XS in pb' in line:
                     if ' 1 ' in line:
@@ -246,12 +266,59 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                         Xsec_bb = line.split()[1]
                     elif ' 101 ' in line:
                         integerror_bb = line.split()[1]
-                    elif ' 102 ' in line:
-                        muRm_bb = line.split()[1]
-                    elif ' 103 ' in line:
-                        muRp_bb = line.split()[1]
-        return float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRp_gg), float(Xsec_bb), float(integerror_bb)
 
+                if return_xsc_byComputationOrder:
+                    if 'Block XSGGH ' in line:
+                        if ' 1 ' in line:
+                            ggh_lo = line.split()[1]
+                        elif ' 101 ' in line:
+                            integerror_ggh_lo = line.split()[1]
+                        elif ' 2 ' in line:
+                            ggh_nlo = line.split()[1]
+                        elif ' 102 ' in line:
+                            integerror_ggh_nlo = line.split()[1]
+                        
+                    if ' NLO gg' in line:
+                        if ' 21 ' in line:
+                            subprocess_gg_nlo = line.split()[1]
+                        elif ' 121 ' in line:
+                            integerror_gg_nlo = line.split()[1]
+                        
+                    if ' NLO qg' in line:
+                        if ' 22 ' in line:
+                            subprocess_qg_nlo = line.split()[1]
+                        elif ' 122 ' in line:
+                            integerror_qg_nlo = line.split()[1]
+                    if ' NLO qq' in line:
+                        if ' 23 ' in line:
+                            subprocess_qq_nlo = line.split()[1]
+                        elif ' 123 ' in line:
+                            integerror_qq_nlo = line.split()[1]
+                        
+                    if 'Block XSBBH' in line:
+                        if ' 1 ' in line:
+                            bbh_lo = line.split()[1]
+                        elif ' 2 ' in line:
+                            bbh_nlo = line.split()[1]
+                        elif ' 3 ' in line:
+                            bbh_nnlo = line.split()[1]
+                        elif ' 101 ' in line:
+                            integerror_bbh_lo = line.split()[1]
+                        elif ' 102 ' in line:
+                            integerror_bbh_nlo = line.split()[1]
+                        elif ' 103 ' in line:
+                            integerror_bbh_nnlo = line.split()[1]
+    
+        return (( #float(bbh_lo), float(bbh_nlo), float(bbh_nnlo), 
+                  #float(integerror_bbh_lo), float(integerror_bbh_nlo), float(integerror_bbh_nnlo), 
+
+                  #float(ggh_lo), float(ggh_nlo), float(integerror_ggh_lo), float(integerror_ggh_nlo), 
+                   
+                  float(subprocess_gg_nlo), float(subprocess_qg_nlo), float(subprocess_qq_nlo), 
+                  float(integerror_gg_nlo), float(integerror_qg_nlo), float(integerror_qq_nlo),) 
+                  if return_xsc_byComputationOrder 
+                  else (float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRp_gg), 
+                        float(Xsec_bb), float(integerror_bb)) )
 
     def computeBR(self):
 
@@ -313,6 +380,16 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     modeh = 0
                     modeA = 0
                     modeH = 0
+                    modeHc = 1
+
+                elif "23    36" in line :
+                    ZABRLine2 = line.replace("       ","")
+                    ZABRLine3 = ZABRLine2.replace("     2      23    36","")
+                    if modeH == 1 :
+                        self.HtoZABR = float(ZABRLine3)
+                    elif modeh == 1 :
+                        self.htoZABR = float(ZABRLine3)
+    
                     modeHc = 1
 
                 elif "23    36" in line :
@@ -484,7 +561,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoglugluBR = float(glugluBRLine3)
                   elif modeh == 1 :
                     self.htoglugluBR = float(glugluBRLine3)
-
+                
                 elif "lambda_1" in line:
                     self.lambda_1 = line.split()[1]
                 elif "lambda_2" in line:
