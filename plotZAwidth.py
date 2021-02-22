@@ -178,9 +178,9 @@ def Calculators42HDM(list_masses, list_tb, return_scaledXSC= False, return_total
         print (80*'*')
     mass_rng = 'from{}to{}'.format( float_to_str(list_masses.min(), 2), float_to_str(list_masses.max(), 2))
     tb_rng = 'from{}to{}'.format( float_to_str(list_tb.min(), 2), float_to_str(list_tb.max(), 2))
-    json_Totalwidth='totalwidth_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
-    json_Totalxsc='totalxsc_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
-    json_TotalxscXbr='totalxscXbr_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
+    json_Totalwidth='data/totalwidth_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
+    json_Totalxsc='data/totalxsc_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
+    json_TotalxscXbr='data/totalxscXbr_2HDM-type{}_cosbeta-alpha-{}_func_of_tb-{}_{}-{}.json'.format(type, float_to_str(cba, 2), tb_rng, options.scan.upper(), mass_rng)
     with open(json_Totalwidth, 'w+') as f:
         json.dump(widths, f)
     with open(json_TotalxscXbr, 'w+') as f:
@@ -190,10 +190,10 @@ def Calculators42HDM(list_masses, list_tb, return_scaledXSC= False, return_total
     
     return ((json_TotalxscXbr if return_scaledXSC else( json_Totalxsc) )if not return_totalwidth else (json_Totalwidth))
 
-def MakeWidthPLots(M, TANbeta):
+def MakeWidthPLots(M, TANbeta, LookatNWA = False):
     fig, ax = plt.subplots(figsize=(8, 6))
     if options.lazy:
-        jsonfile='totalwidth_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'
+        jsonfile='data/totalwidth_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'
     else:
         jsonfile= Calculators42HDM(M, TANbeta, return_scaledXSC= False, return_totalwidth= True)
 
@@ -202,29 +202,38 @@ def MakeWidthPLots(M, TANbeta):
     tb_toplot = ["1.0", "1.5", "3.0", "10.0", "19.0"]
     colors = ["#CD5C5C", "#0e6655", "darkred", "#85c1e9", "#8e44ad", "#d4ac0d" , "aqua", "#273746"]
     from matplotlib import colors as mcolors
-    for i, beta in enumerate(tb_toplot):
-        
+    for idx, beta in enumerate(tb_toplot):
+       
         x= data[beta][options.scan]
-        y_hwidth =data[beta]['hwidth']     
-        y_Hwidth =data[beta]['Hwidth']     
-        y_Awidth =data[beta]['Awidth']     
-        y_Hcwidth =data[beta]['H+width']     
+        
+        SM_M = [125.]*len(data[beta]['hwidth']) if LookatNWA else (1.)
+        Heavy_M = data[beta]["mH"] if LookatNWA else(1.)
+        Pseudo_M = data[beta]["mA"] if LookatNWA else(1.)
 
-        plt.plot(x, y_hwidth, color=colors[i+1], linestyle=(0, (3, 1, 1, 1)), linewidth=2, markersize=10)#, alpha = 0.5)#, label='$\Gamma_{SM}$')
-        plt.plot(x, y_Hwidth, color=colors[i+1], linewidth=2.5, markersize=10, label=r'tan$\beta = %s$'%beta.replace('.0','')) 
-        plt.plot(x, y_Awidth, color=colors[i+1], linestyle='dashed', linewidth=2.5, markersize=10)#, label='$\Gamma_{A}$') 
+        if LookatNWA:
+            y_hwidth = [i / j for i, j in zip(data[beta]['hwidth'], SM_M)]
+            y_Hwidth = [i / j for i, j in zip(data[beta]['Hwidth'], Heavy_M)]
+            y_Awidth = [i / j for i, j in zip(data[beta]['Awidth'], Pseudo_M)]
+        else:
+            y_hwidth =data[beta]['hwidth']     
+            y_Hwidth =data[beta]['Hwidth']  
+            y_Awidth =data[beta]['Awidth']     
+            #y_Hcwidth =data[beta]['H+width']
+
+        plt.plot(x, y_hwidth, color=colors[idx+1], linestyle=(0, (3, 1, 1, 1)), linewidth=2, markersize=10)#, alpha = 0.5)#, label='$\Gamma_{SM}$')
+        plt.plot(x, y_Hwidth, color=colors[idx+1], linewidth=2.5, markersize=10, label=r'tan$\beta = %s$'%beta.replace('.0','')) 
+        plt.plot(x, y_Awidth, color=colors[idx+1], linestyle='dashed', linewidth=2.5, markersize=10)#, label='$\Gamma_{A}$') 
         #plt.plot(x, y_Hcwidth, color=colors[i+1], linestyle='dashed', linewidth=2.5, markersize=12)#, label='$\Gamma_{H+}$') 
-    
     title = r'M_{A}= M_{H}-M_{Z}' if options.scan=='mH' else ( r'M_{H}= M_{A}+M_{Z}')
-    plt.title(r'$2HDM-typeII: %s, M_{H^+}=M_{H}, cos(\beta-\alpha)= 0.01, m12= 0. GeV, mh= 125. GeV$'%(title), fontsize=10)
+    plt.title(r'$2HDM-typeII: %s, M_{H^\pm}=M_{H}, cos(\beta-\alpha)= 0.01, m12= (M_{H^\pm}^2 *tan\beta )/(1+tan\beta^2), mh= 125. GeV$'%(title), fontsize=10)
     labelLines(plt.gca().get_lines(),align=True,fontsize=10)#, backgroundcolor="#ffffff00")
     
-    ax.set_ylabel(r'$\Gamma_{tot} [GeV]$', fontsize=18, horizontalalignment='right', y=1.0)
+    ax.set_ylabel(r'$\Gamma_{tot} /M [GeV]$', fontsize=18, horizontalalignment='right', y=1.0)
     ax.set_xlabel(r'${}[GeV]$'.format(options.scan.upper()), fontsize=14, horizontalalignment='right', y=1.0)
     xmin= (30. if  options.scan=="mA" else(120.))
     xmax= (1100. if  options.scan=="mA" else(1200.))
-    ymin = 1e-3
-    ymax = 10e2
+    ymin = 1e-5
+    ymax = 10e-1
     
     ax.set_xlim(xmin=xmin, xmax=xmax)
     ax.set_ylim(ymin=ymin, ymax=ymax)
@@ -233,8 +242,8 @@ def MakeWidthPLots(M, TANbeta):
     ax.legend([r'$\Gamma_{SM}$', r'$\Gamma_{A}$', r'$\Gamma_{H}$'])
 
     fig.tight_layout()
-    fig.savefig('scan{}_vs_totalwidth.png'.format(options.scan))
-    fig.savefig('scan{}_vs_totalwidth.pdf'.format(options.scan))
+    fig.savefig('scan{}_vs_totalwidth{}.png'.format(options.scan, 'DividedMass' if LookatNWA else('')))
+    #fig.savefig('scan{}_vs_totalwidth{}.pdf'.format(options.scan))
     plt.gcf().clear()
 
     return fig
@@ -250,7 +259,7 @@ def MakeXSCPLots(M, TANbeta):
     CMSStyle.changeFont()
     
     if options.lazy: 
-        jsonfile='totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'
+        jsonfile='data/totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'
     else:
         jsonfile= Calculators42HDM(M, TANbeta, return_scaledXSC= options.scale, return_totalwidth= False)
   
@@ -290,7 +299,7 @@ def MakeXSCPLots(M, TANbeta):
     labelLines(plt.gca().get_lines(),align=True,fontsize=10)
     
     fig.savefig('1Dscan_{}_vs_xsc.png'.format(options.scan))
-    fig.savefig('1Dscan_{}_vs_xsc.pdf'.format(options.scan))
+    #fig.savefig('1Dscan_{}_vs_xsc.pdf'.format(options.scan))
     
     plt.gcf().clear()
     return fig
@@ -301,8 +310,8 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.27, hspace=None)
     
     if options.lazy:
-        #jsonfile=( 'totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json' if options.scale else('totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'))
-        jsonfile=( 'totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json' if options.scale else('totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json'))
+        #jsonfile=( 'data/totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json' if options.scale else('data/totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb.json'))
+        jsonfile=( 'data/totalxscXbr_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json' if options.scale else('data/totalxsc_2HDM-type2_cosbeta-alpha-0p01_func_of_tb-from0p50to59p50_MH-from125p00to1125p00.json'))
     else:
         jsonfile= Calculators42HDM(M, TANbeta, return_scaledXSC = options.scale , return_totalwidth= False)
 
@@ -313,10 +322,8 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     z1_axis=[]
     z2_axis=[]
     
-    print( sorted( float(k) for k in data.keys()) )
     for k in sorted( float(k) for k in data.keys()):
         x= data[str(k)][options.scan]
-        print( x )
         y = [k]*len(x)
         z1_xsc_gg=data[str(k)]['gg-fusion']
         z2_xsc_bb=data[str(k)]['bb-associated_production']
@@ -324,34 +331,36 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
         y_axis.append( y)
         z1_axis.append(z1_xsc_gg)
         z2_axis.append(z2_xsc_bb)
-    print( 'y len:', len(y_axis), 'x len:', len(x_axis))     
+    #print( sorted( float(k) for k in data.keys()) )
+    #print( 'y len:', len(y_axis), 'x len:', len(x_axis))     
     #print( max(range(len(z1_axis))), max(range(len(z1_axis)), key=z1_axis.__getitem__))
+    
     new_x = np.asarray(x_axis)
     new_y = np.asarray(y_axis)
+    
     z1 = np.asarray(z1_axis)
     z2 = np.asarray(z2_axis)
-    print( new_x)
     if interploate:
         interp_x = np.arange(new_x.min(), new_x.max(), 10.)
-        interp_y = np.arange(new_y.min(), new_x.max(), 0.1)
+        interp_y = np.arange(new_y.min(), new_x.max(), 1.)
+        #print( len(interp_x), len(interp_y))
         X, Y = np.meshgrid(interp_x, interp_y)
         
         fun1 = interpolate.interp2d(new_x, new_y, z1, kind='cubic')
         fun2 = interpolate.interp2d(new_x, new_y, z2, kind='cubic')
-    
         Z1= fun1( interp_x, interp_y)
         Z2= fun2( interp_x, interp_y)
-        
-        z1_reshape = Z1.reshape(len(interp_x), len(interp_y))
-        z2_reshape = Z2.reshape(len(interp_x), len(interp_y))
+        #z1_reshape = Z1.reshape(len(interp_x), len(interp_y))
+        #z2_reshape = Z2.reshape(len(interp_x), len(interp_y))
     
     xmin = (125. if options.scan=='mH' else (30.))
     xmax = 1000.
     from mpl_toolkits.axes_grid1 import make_axes_locatable    
     from matplotlib.ticker import LogFormatter 
     import matplotlib.colors as colors
-    
-    axs1.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
+   
+    optstitle = ('M_{A}= M_{H}-M_{Z}'if options.scan =='mH' else( 'M_{H}= M_{A}+M_{Z}'))
+    axs1.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., %s, M_{H^+}=M_{H}$'%optstitle)
     axs1.set_xlabel('{} [GeV]'.format(options.scan.upper()), horizontalalignment='center',fontsize=18)
     axs1.set_ylabel( r'$tan\beta$', horizontalalignment='right', fontsize=18)
     #axs1.xaxis.set_ticks(M)
@@ -365,33 +374,40 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     from matplotlib.ticker import MaxNLocator
     cmap = plt.get_cmap('jet')
     levels = MaxNLocator(nbins=15).tick_values(z1.min(), z1.max())
-    #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
-    #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.LogNorm(vmin = z1.min(), vmax = z1.max()))
-    im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z1.min(), vmax = z1.max()))
+    if interploate :
+        im1 = axs1.pcolormesh( interp_x, interp_y, Z1, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z1.min(), vmax = z1.max()))
+    else:
+        #im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
+        im1 = axs1.pcolormesh( new_x, new_y, z1, cmap=cmap, norm=colors.LogNorm(vmin = z1.min(), vmax = z1.max()))
+
     divider = make_axes_locatable(axs1)
     cax1 = divider.append_axes("right", size="5%", pad=0.05)
     #cax1.set_xticks(new_x)
     #cax1.set_yticks(new_y)
     cbar1 = plt.colorbar(im1, cax=cax1)
     if options.scale: 
-        cbar1.set_label(label=r'$\sigma$ (gg fusion)* BR(H $\rightarrow$ ZA)* BR(A $\rightarrow$ bb~) [pb]$', size=18)
+        cbar1.set_label(label=r'$\sigma (gg fusion)* BR(H \rightarrow ZA)* BR(A \rightarrow bb) [pb]$', size=18)
     else:
         cbar1.set_label(label=r'$\sigma$ (gg fusion) [pb]', size=18)
     #cbar.ax.tick_params(labelsize=18)
 
-    axs2.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., M_{A}= M_{H}-M_{Z}, M_{H^+}=M_{H}$')
+    axs2.title.set_text(r'$2HDM-TypeII: cos(\beta-\alpha)= 0.01, mh = 125., %s, M_{H^\pm}=M_{H}$'%optstitle)
     axs2.set_xlabel('{} [GeV]'.format(options.scan.upper()), horizontalalignment='center', fontsize=18)
     axs2.set_ylabel( r'$tan\beta$', horizontalalignment='right', fontsize=18)
     axs2.set_xlim([xmin, xmax])
     axs2.set_ylim([new_y.min(), new_y.max()])
-    
-    #im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
-    im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z2.min(), vmax = z2.max()))
+    if interploate:
+        #im2 = axs2.pcolormesh( interp_x, interp_y, Z2, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z2.min(), vmax = z2.max()))
+        im2 = axs2.pcolormesh( interp_x, interp_y, Z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
+    else:
+        #im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
+        im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
+
     divider = make_axes_locatable(axs2)
     cax2 = divider.append_axes("right", size="5%", pad=0.05)
     cbar2 = plt.colorbar(im2, cax=cax2)
     if options.scale:
-        cbar2.set_label(label =r'$\sigma$ (bb associated production)* BR(H $\rightarrow$ ZA)* BR(A $\rightarrow$ bb~) [pb]$', size=18)
+        cbar2.set_label(label =r'$\sigma (bb associated production)* BR(H \rightarrow ZA)* BR(A \rightarrow bb) [pb]$', size=18)
     else:
         cbar2.set_label(label =r'$\sigma$ (bb associated production) [pb]',size=18)
     #cbar.ax.tick_params(labelsize=18)
@@ -399,7 +415,7 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
     #plt.tight_layout()
     plt.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.png".format(options.scan))
     plt.savefig("2Dscan_totalxsc_func_{}_and_tanbeta.pdf".format(options.scan))
-    plt.grid()
+    #plt.grid()
     plt.gcf().clear()
     return fig
 
@@ -414,5 +430,5 @@ elif options.scan =="mH":
     M = np.arange(125.,1190.,100. )
 
 #MakeXSCPLots(M, TANbeta) 
-#MakeWidthPLots(M, TANbeta)
-MakePLotsIn2D(M, TANbeta, interploate=False)
+MakeWidthPLots(M, TANbeta, LookatNWA = True)
+MakePLotsIn2D(M, TANbeta, interploate=True)

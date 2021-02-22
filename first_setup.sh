@@ -16,3 +16,4 @@ git remote add origin git@github.com:${GITHUBUSERNAME}/${GITHUBUSERREMOTE}
 # Add the remaining forks
 git remote add OlivierBondu https://github.com/OlivierBondu/Calculators42HDM.git
 git remote add AlexandreMertens https://github.com/AlexandreMertens/Calculators42HDM.git
+git remote add KhawlaJaffel git@github.com:kjaffel/Calculators42HDM.git
