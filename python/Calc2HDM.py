@@ -209,6 +209,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         os.chdir(os.path.join(pwd, path_tosushi_output_cards ))
         print( os.path.join(pwd, path_tosushi_output_cards )) 
         run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiInputCardPath_1, sushiOutputCardPath_1]
+        #run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
         print( " ".join(run_sushi) )
         if not os.path.isfile(sushiOutputCardPath):
             try:
@@ -442,7 +443,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.htoccBR = float(ccBRLine3)
 
 
-                elif "11    -11" in line :
+                elif "11   -11" in line :
                   eeBRLine2=line.replace("     2      11   -11","")
                   eeBRLine3 = eeBRLine2.replace("       ","")
                   if modeH == 1 :
@@ -452,7 +453,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                   elif modeh == 1 :
                     self.htoeeBR = float(eeBRLine3)
 
-                elif "13    -13" in line :
+                elif "13   -13" in line :
                   mumuBRLine2=line.replace("     2      13   -13","")
                   mumuBRLine3 = mumuBRLine2.replace("       ","")
                   if modeH == 1 :
