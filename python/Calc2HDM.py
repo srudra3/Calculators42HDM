@@ -105,6 +105,8 @@ class Calc2HDM:
         self.htoggBR = 0
         self.AtoggBR = 0
 
+        self.wh3tobb = 0
+
         self.stability = 0
         self.unitarity = 0
         self.perturbativity = 0
@@ -327,9 +329,9 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
         command = ["./2HDMC-1.8.0/CalcPhys", str(self.mh), str(self.mH), str(self.mA), str(self.mhc), str(self.sba), "0", "0", str(self.m12_2), str(self.tb), str(self.type), self.outputFile]
         outputExists = False # FIXME: default output is out.dat, not really bug-proof...
         # outputExists = os.path.isfile(self.outputFile)
+        log = self.outputFile.replace('dat', 'log')
         if not outputExists:
             print ' '.join(command)
-            log = self.outputFile.replace('dat', 'log')
             with open(log, 'w') as f:
                 p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
                 p.communicate() # wait until process finishes
@@ -337,6 +339,14 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             print '# 2HDMC was run already, looking for results in %s' % self.outputFile
 
 #        print "reading theory constraints from "+ self.outputFile
+
+        with open(os.path.join(log)) as f:
+            for line in f:
+                if 'A  -> b  b' in line:
+                    # A  -> b  b     4.433e+00      8.670e-01
+                    myLine=line.replace('A  -> b  b     ', '')
+                    myLine2=myLine.split('      ')[0]
+                    self.wh3tobb = float(myLine2)
 
         UnitLine = None
         PertLine = None
