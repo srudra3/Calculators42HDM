@@ -4,6 +4,35 @@ import sys
 import linecache
 import math
 import os
+import logging
+LOG_LEVEL = logging.DEBUG
+stream = logging.StreamHandler()
+stream.setLevel(LOG_LEVEL)
+logger = logging.getLogger("Calculators42HDM")
+logger.setLevel(LOG_LEVEL)
+logger.addHandler(stream)
+try:
+    import colorlog
+    from colorlog import ColoredFormatter
+    formatter = ColoredFormatter(
+    "%(log_color)s%(levelname)-8s%(reset)s %(log_color)s%(message)s",
+    datefmt=None,
+    reset=True,
+    log_colors={
+            'DEBUG':    'cyan',
+            'INFO':     'green',
+            'WARNING':  'blue',
+            'ERROR':    'red',
+            'CRITICAL': 'red',
+        },
+        secondary_log_colors={},
+        style='%'
+        )
+    stream.setFormatter(formatter)
+except ImportError:
+# https://pypi.org/project/colorlog/
+    pass
+
 
 class Calc2HDM:
     def __init__(self, mode = 'H', sqrts = 13000,  muR = 0.5, muF = 0.5, type = 2, tb = 1, m12 = 0, mh = 125, mH = 350, mA = 400, mhc = 420, sba = 0.99, outputFile = "out.dat"):
@@ -33,7 +62,7 @@ class Calc2HDM:
         self.muF = muF
         self.BRcomputed = 0
         #self.pdf = "CT10nnlo.LHgrid" 
-        self.pdf= "NNPDF31_nnlo_as_0118_mc_hessian_pdfas"
+        self.pdf= "NNPDF31_nnlo_as_0118_nf_4_mc_hessian"
         self.lambda_1 = 0
         self.lambda_2 = 0
         self.lambda_3 = 0
@@ -106,25 +135,27 @@ class Calc2HDM:
         self.AtoggBR = 0
 
         self.wh3tobb = 0
+        self.wh2tobb = 0
 
         self.stability = 0
         self.unitarity = 0
         self.perturbativity = 0
     def __str__(self):
-        return """tb= %.2f
-m12= %.2f
-mh= %.2f
-mH= %.2f
-mA= %.2f
-mhc= %.2f
-sba= %.2f
-type= %i
-outputFile= %s
-sqrts= %.2f
-muR= %.2f
-muF= %.2f
-BRcomputed= %.2f
-pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, self.type, self.outputFile, self.sqrts, self.muR, self.muF, self.BRcomputed, self.pdf)
+        return """
+            tb= %.2f
+            m12= %.2f
+            mh= %.2f
+            mH= %.2f
+            mA= %.2f
+            mhc= %.2f
+            sba= %.2f
+            type= %i
+            outputFile= %s
+            sqrts= %.2f
+            muR= %.2f
+            muF= %.2f
+            BRcomputed= %.2f
+            pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, self.type, self.outputFile, self.sqrts, self.muR, self.muF, self.BRcomputed, self.pdf)
 
     def setmA(self, M) :
         self.mA = M
@@ -158,24 +189,16 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
 
     def setoutputFile(self,outputFile) :
         self.outputFile=outputFile
-
-    def getXsecFromSusHi(self, return_xsc_byComputationOrder = False) :
-     
+    
+    def getXsecFromSusHi(self, sushiCardName = None, return_xsc_byComputationOrder = False) :
+        sushiCardName = (str(self.mH).replace('.', 'p').replace('-', 'm') 
+        + "_"+str(self.mA).replace('.', 'p').replace('-', 'm') 
+        +"_" +str(self.tb).replace('.', 'p').replace('-', 'm')
+        +"_" + str(self.muR).replace('.', 'p').replace('-', 'm')
+        +"_" + str(self.muF).replace('.', 'p').replace('-', 'm') )
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        #cba = math.sqrt(1-self.sba*self.sba)
-        b = math.atan(self.tb)
-        sushiCardName = (
-            str(self.mH).replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.mA).replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.muF).replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.muR).replace('.', 'p').replace('-', 'm') + 
-            "_" + str(self.tb).replace('.', 'p').replace('-', 'm') +
-            "_" + str(self.sba)[:5].replace('.', 'p').replace('-', 'm') 
-            )#+ "_" + str(self.pdf)) # keep the dots in the pdf name
         sushiInputCardPath = "Scan/"+ str(self.pdf) +'/' + sushiCardName + ".in"
         sushiOutputCardPath = "Scan/" + str(self.pdf) +'/'+ sushiCardName + ".out"
-        sushiInputCardPath_1 = sushiCardName + ".in"
-        sushiOutputCardPath_1 = sushiCardName + ".out"
         
         path_tosushi_output_cards="Scan/"+ str(self.pdf)
         if not os.path.exists(path_tosushi_output_cards):
@@ -208,18 +231,22 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
      
         #running SusHi
         pwd = os.getcwd()
-        os.chdir(os.path.join(pwd, path_tosushi_output_cards ))
-        print( os.path.join(pwd, path_tosushi_output_cards )) 
-        run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiInputCardPath_1, sushiOutputCardPath_1]
-        #run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiInputCardPath, sushiOutputCardPath]
+        #print ('workDIR:', os.path.join(pwd, path_tosushi_output_cards ))
+        run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiCardName + ".in", sushiCardName + ".out"]
         print( " ".join(run_sushi) )
-        if not os.path.isfile(sushiOutputCardPath):
-            try:
-                subprocess.check_call( " ".join(run_sushi), shell=True)
-            except subprocess.CalledProcessError as error:
-                print error
+        outputExists = False # overwrite these files 
+        if not outputExists:
+            log = sushiCardName.replace('out', 'log')
+            with open(log, 'w') as f:
+                p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=os.path.join(pwd, path_tosushi_output_cards ))
+                p.communicate()
+            #try:
+            #    #subprocess.call(run_sushi, shell=False)
+            #    subprocess.check_call(run_sushi, shell=False)
+            #except subprocess.CalledProcessError as error:
+            #    logger.error(error)
         else:
-            print '# SusHi was run already, looking for results in %s' % sushiOutputCardPath
+            print('# SusHi was run already, looking for results in %s' % sushiOutputCardPath)
         
         os.chdir(pwd)
         Xsec = None
@@ -254,7 +281,10 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
             integerror_bbh_nlo = 0   # +/-: NLO
             integerror_bbh_nnlo = 0  # +/-: NNLO            
             
+            mb_MSscheme_muR = 0.
             for line in f:
+                if '# m_b for bottom Yukawa' in line:
+                    mb_MSscheme_muR = line.split()[1]
                 if 'ggh XS in pb' in line:
                     if ' 1 ' in line:
                         Xsec_gg = line.split()[1]
@@ -321,7 +351,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                   float(integerror_gg_nlo), float(integerror_qg_nlo), float(integerror_qq_nlo),) 
                   if return_xsc_byComputationOrder 
                   else (float(Xsec_gg), float(integerror_gg), float(muRm_gg), float(muRp_gg), 
-                        float(Xsec_bb), float(integerror_bb)) )
+                        float(Xsec_bb), float(integerror_bb), float(mb_MSscheme_muR)) )
 
     def computeBR(self):
 
@@ -336,17 +366,18 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                 p = subprocess.Popen(command, stdout=f, stderr=f, cwd=pwd)
                 p.communicate() # wait until process finishes
         else:
-            print '# 2HDMC was run already, looking for results in %s' % self.outputFile
-
-#        print "reading theory constraints from "+ self.outputFile
+            print ('# 2HDMC was run already, looking for results in %s' % self.outputFile)
 
         with open(os.path.join(log)) as f:
             for line in f:
                 if 'A  -> b  b' in line:
-                    # A  -> b  b     4.433e+00      8.670e-01
                     myLine=line.replace('A  -> b  b     ', '')
                     myLine2=myLine.split('      ')[0]
                     self.wh3tobb = float(myLine2)
+                if 'H  -> b  b' in line:
+                    myLine=line.replace('H  -> b  b     ', '')
+                    myLine2=myLine.split('      ')[0]
+                    self.wh2tobb = float(myLine2)
 
         UnitLine = None
         PertLine = None
@@ -376,7 +407,7 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     modeh = 1
                     modeH = 0
                     modeA = 0
-                if "DECAY  35" in line :
+                elif "DECAY  35" in line :
                     self.Hwidth = float(line.split()[2])
                     modeh = 0
                     modeH = 1
@@ -401,8 +432,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     elif modeh == 1 :
                         self.htoZABR = float(ZABRLine3)
     
-                    modeHc = 1
-
                 elif "23    36" in line :
                     ZABRLine2 = line.replace("       ","")
                     ZABRLine3 = ZABRLine2.replace("     2      23    36","")
@@ -416,7 +445,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     ZHBRLine3 = ZHBRLine2.replace("     2      23    35","")
                     self.AtoZHBR = float(ZHBRLine3)
             
-            
                 elif "36    36" in line :
                     AABRLine2 = line.replace("       ","")
                     AABRLine3 = AABRLine2.replace("     2      36    36","")
@@ -425,7 +453,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     elif modeh == 1 :
                         self.htoAABR = float(AABRLine3)
     
-            
                 elif "35    35" in line and modeH == 1 :
                   HHBRLine2 = line.replace("       ","")
                   HHBRLine3 = HHBRLine2.replace("     2      35    35","")
@@ -440,7 +467,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtossBR = float(ssBRLine3)
                   elif modeh == 1 :
                     self.htossBR = float(ssBRLine3)
-            
 
                 elif "4    -4" in line :
                   ccBRLine2=line.replace("     2       4    -4","")
@@ -451,7 +477,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoccBR = float(ccBRLine3)
                   elif modeh == 1 :
                     self.htoccBR = float(ccBRLine3)
-
 
                 elif "11   -11" in line :
                   eeBRLine2=line.replace("     2      11   -11","")
@@ -482,7 +507,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoZgaBR = float(ZgaBRLine3)
                   elif modeh == 1 :
                     self.htoZgaBR = float(ZgaBRLine3)
-
                 
                 elif "5    -5" in line :
                   bbBRLine2 = line.replace("     2       5    -5","")
@@ -501,7 +525,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.HtoZhBR = float(ZhBRLine3)
                   elif modeA == 1 :
                     self.AtoZhBR = float(ZhBRLine3)
-            
             
                 elif "6    -6" in line :
                   ttBRLine2 = line.replace("     2       6    -6","")
@@ -550,7 +573,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoWWBR = float(WWBRLine3)
                   elif modeh == 1 :
                     self.htoWWBR = float(WWBRLine3)
-                  #print "BR WW", WWBR
             
                 elif "22    22" in line :
                   ggBRLine2 = line.replace("     2      22    22","")
@@ -561,7 +583,6 @@ pdf= %s""" % (self.tb, self.m12, self.mh, self.mH, self.mA, self.mhc, self.sba, 
                     self.AtoggBR = float(ggBRLine3)
                   elif modeh == 1 :
                     self.htoggBR = float(ggBRLine3)
-                  #print "BR gg", ggBR
            
                 elif "21    21" in line :
                   glugluBRLine2 = line.replace("     2      21    21","")

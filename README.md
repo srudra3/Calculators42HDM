@@ -1,7 +1,7 @@
 
 # 2HDMC - Two-Higgs-Doublet Model Caclulators -
 2HDMC is a general-purpose calculator for the two-Higgs doublet model. It allows parametrization of the Higgs potential in many different ways, convenient specification of generic Yukawa sectors, the evaluation of decay widths (including higher-order QCD corrections), theoretical constraints and much more.
-
+Version used: 2HDMC1.8.0 and Sushi1.7.0
 ## Install in a CMSSW release:
 ```bash
     # setup your env 
@@ -57,3 +57,6 @@ make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 - It can also be useful to download HiggsBounds/HiggsSignals (** optional** , Note: 2HDMC work without HB/HS), since 2HDMC can interface the LEP, Tevatron and LHC constraints implemented in these codes. HiggsBounds/HiggsSignals are available: 
 - [HiggsBounds](http://higgsbounds.hepforge.org)
 - [HiggsSignals](http://higgsbounds.hepforge.org)
+## Useful Links:  
+- [2HDME: Two-Higgs-Doublet Model Evolver](https://arxiv.org/pdf/1811.08215.pdf) 
+- [Flavour Les Houches Accord: Interfacing Flavour related Codes](https://arxiv.org/pdf/1008.0762.pdf)

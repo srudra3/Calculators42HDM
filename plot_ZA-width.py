@@ -214,6 +214,10 @@ def MakeWidthPLots(M, TANbeta, LookatNWA = False):
             y_hwidth = [i / j for i, j in zip(data[beta]['hwidth'], SM_M)]
             y_Hwidth = [i / j for i, j in zip(data[beta]['Hwidth'], Heavy_M)]
             y_Awidth = [i / j for i, j in zip(data[beta]['Awidth'], Pseudo_M)]
+            
+            Hwidth_dev_mass = [(i / j)*100 for i, j in zip(data[beta]['Hwidth'], Heavy_M)]
+            Awidth_dev_mass = [(i / j)*100 for i, j in zip(data[beta]['Awidth'], Pseudo_M)]
+            print( ' Gamma/mass_A: ', Awidth_dev_mass, ' Gamma/mass_H: ', Hwidth_dev_mass)
         else:
             y_hwidth =data[beta]['hwidth']     
             y_Hwidth =data[beta]['Hwidth']  
@@ -400,8 +404,8 @@ def MakePLotsIn2D(M, TANbeta, interploate=False):
         #im2 = axs2.pcolormesh( interp_x, interp_y, Z2, cmap=cmap, norm=colors.SymLogNorm(linthresh=0.03, linscale=0.03, vmin = z2.min(), vmax = z2.max()))
         im2 = axs2.pcolormesh( interp_x, interp_y, Z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
     else:
-        #im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
-        im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
+        #im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=BoundaryNorm(levels, ncolors=cmap.N, clip=True) )
+        im2 = axs2.pcolormesh( new_x, new_y, z2, cmap=cmap, norm=colors.LogNorm(vmin = z2.min(), vmax = z2.max()))
 
     divider = make_axes_locatable(axs2)
     cax2 = divider.append_axes("right", size="5%", pad=0.05)
@@ -431,4 +435,4 @@ elif options.scan =="mH":
 
 #MakeXSCPLots(M, TANbeta) 
 MakeWidthPLots(M, TANbeta, LookatNWA = True)
-MakePLotsIn2D(M, TANbeta, interploate=True)
+MakePLotsIn2D(M, TANbeta, interploate=False)
