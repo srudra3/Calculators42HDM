@@ -16,6 +16,11 @@ mZ = 91.1876
 outputFile = "out.dat"
 ZtollBR =  3.3658 * 2 / 100. # no taus
 
+process = 'ggH'
+mb = 4.92 # mb(OS) pole mass
+mb__tilde__ = 4.92 # mb~
+MZ= 9.118760e+01
+
 results = {
     'mH': [],
     'mA': [],
@@ -32,31 +37,39 @@ def float_to_str(x, digits=2):
     return tmp.replace('.', 'p')
 
 for mH in xrange(125, 1010, 10):
-    for mA in xrange(90, 1010, 10):
+    for mA in xrange(30, 1010, 10):
         if mA >= mH:
             mode = 'A'
         else:
             mode = 'H'
         mhc = max(mH, mA)
         m12 = math.sqrt(pow(mhc, 2) * tb / (1 + pow(tb, 2)))
+        
+        if process =='ggH':
+            muR = mH/2
+            muF = muR
+        elif process == 'bbH':
+            muR = (mA + MZ + mb + mb__tilde__ )
+            muF =muR
+        
         print mode
-        x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR = 1., muF = 1.)
-        x.setpdf('NNPDF30_lo_as_0130_nf_4')
+        x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR = muR, muF = muF)
+        x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
         x.computeBR()
-        xsec, err_integration, err_muRm, err_muRp = x.getXsecFromSusHi()
+        xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH, mb_MSscheme_muR= x.getXsecFromSusHi()
         if mode == 'H':
             #print "xsec, HtoZABR, AtobbBR ", xsec, x.HtoZABR, x.AtobbBR
-            sigmaBR = xsec * x.HtoZABR * x.AtobbBR * ZtollBR 
+            sigmaBR = xsec_ggH * x.HtoZABR * x.AtobbBR * ZtollBR 
         else:
             #print "xsec, AtoZHBR, HtobbBR ", xsec, x.AtoZHBR, x.HtobbBR
-            sigmaBR = xsec * x.AtoZHBR * x.HtobbBR * ZtollBR 
+            sigmaBR = xsec_ggH * x.AtoZHBR * x.HtobbBR * ZtollBR 
         print "# xsec * BR = ", sigmaBR
         results['mH'].append(mH)
         results['mA'].append(mA)
-        results['sigma'].append(xsec)
-        results['sigma_errIntegration'].append(err_integration)
-        results['sigma_err_muRm'].append(err_muRm)
-        results['sigma_err_muRp'].append(err_muRp)
+        results['sigma'].append(xsec_ggH)
+        results['sigma_errIntegration'].append(err_integration_ggH)
+        results['sigma_err_muRm'].append(err_muRm_ggH)
+        results['sigma_err_muRp'].append(err_muRp_ggH)
         if mode == 'H':
             results['BR'].append(x.HtoZABR * x.AtobbBR * ZtollBR)
         else:
