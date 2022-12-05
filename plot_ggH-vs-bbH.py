@@ -16,18 +16,23 @@ def get_options():
 def which_points(grid):
     grid['fullsim'] = [
         #( MH, MA )
-        ( 200, 50), ( 200, 100),
-        ( 250, 50), ( 250, 100),
-        ( 300, 50), ( 300, 100),
-        ( 300, 200),
-        ( 500, 50), 
-        ( 500, 100), ( 500, 200), 
-        ( 500, 300), ( 500, 400),
-        ( 650, 50),
-        ( 800, 50), ( 800, 100), ( 800, 200),              
-        ( 800, 400),              
-        ( 800, 700),
-        (1000, 50),              (1000, 200),                           (1000, 500),
+        #( 800, 140),
+        #( 500, 300),
+        ( 240, 130)
+
+     #   ( 200, 50), ( 200, 100),
+     #   ( 250, 50), ( 250, 100),
+     #   ( 300, 50), ( 300, 100),
+     #   ( 300, 200),
+     #   ( 500, 50), 
+     #   ( 500, 100), ( 500, 200), 
+     #   ( 500, 300), ( 500, 400),
+     #   ( 650, 50),
+     #   ( 800, 50), ( 800, 100), 
+     #   ( 800, 200),              
+     #   ( 800, 400),              
+     #   ( 800, 700),
+     #   (1000, 50),              (1000, 200),                           (1000, 500),
         ]
     return grid 
 
@@ -87,7 +92,7 @@ def ggH_VS_bbH( ):
                 test.setmH(mH)
                 test.computeBR()
             
-                xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH =  test.getXsecFromSusHi()
+                xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH, mb_MSscheme_muR =  test.getXsecFromSusHi()
         
                 xsec_ggH_X_BR = xsec_ggH*test.HtoZABR*test.AtobbBR
                 xsec_bbH_X_BR = xsec_bbH*test.HtoZABR*test.AtobbBR
@@ -106,13 +111,13 @@ def ggH_VS_bbH( ):
                 HtoZABR_list.append(test.HtoZABR)
                 AtobbBR_list.append(test.AtobbBR)
                 
-                tb+=0.1
+                tb+=0.5
         
             ToPlotsggfusion["MH-%s_MA-%s"%(H, A)] = xsec_ggH_list 
             ToPlotsbbproduction["MH-%s_MA-%s"%(H, A)]= xsec_bbH_list
     np.save('data/ggHxsc_X_BR_21signal_2hdm2_func-tb.npy', ToPlotsggfusion)
     np.save('data/bbHxsc_X_BR_21signal_2hdm2_func-tb.npy', ToPlotsbbproduction)
-    return ToPlotsggfusion, ToPlotsbbproduction
+    return ToPlotsggfusion, ToPlotsbbproduction, tb_list
 
 if options.lazy:
     ToPlotsggfusion= np.load( 'data/ggHxsc_X_BR_21signal_2hdm2_func-tb.npy', allow_pickle=True)
@@ -120,10 +125,17 @@ if options.lazy:
 else:
     ggH_VS_bbH()
 
+type = 2
+tb = 10. 
+tb_list = []
+while tb < 21.:
+    tb+=10.
+    tb_list.append(tb)
+
 print( ToPlotsggfusion , ToPlotsbbproduction )
 Colors=['forestgreen', 'pink', 'crimson', 'magenta', 'indigo', 'limegreen', 'blueviolet', 'plum', 'purple', 'hotpink', 'mediumseagreen', 'springgreen', 'aquamarine', 'turquoise', 'aqua', 'mediumslateblue', 'orchid', 'deeppink', 'darkturquoise', 'teal', 'mediumslateblue']
 idx =0
-for (k, val),(k2, val2 ) in zip(ToPlotsggfusion.items(), ToPlotsbbproduction.items()):
+for (k, val),(k2, val2 ) in zip(ToPlotsggfusion.item().items(), ToPlotsbbproduction.item().items()):
     plt.plot(tb_list,val, color=Colors[idx], marker='o', label= '%s'%k)
     plt.plot(tb_list,val2, color=Colors[idx], marker='+')
     idx+=1
@@ -136,5 +148,5 @@ plt.title(r'$2HDM-type%s: M_{H^\pm}=M_{H}, cos(\beta-\alpha)= 0.01, mh= 125. GeV
 plt.xlim(min(tb_list), max(tb_list))
 plt.legend()
 #plt.grid()
-fig.savefig('2hdm-type%s_func-tb_morepoints.png'%(type))
+fig.savefig('2hdm-type%s_func-tb_all21Signalpoints.png'%(type))
 plt.gcf().clear()

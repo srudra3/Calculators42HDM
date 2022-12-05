@@ -34,7 +34,7 @@ from scipy import interpolate
 from scipy.interpolate import make_interp_spline, BSpline
 from matplotlib.gridspec import GridSpec
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
-from labellines import *
+from cp3_llbb.Calculators42HDM.labellines import *
 import logging
 
 LOG_LEVEL = logging.DEBUG
@@ -90,7 +90,7 @@ def ZABR(type2hdm= 2, func_of_cba=False, func_of_tb=False, func_of_mA=False, fun
     elif func_of_mA:
         cba = 0.01
         sba = math.sqrt(1 - pow(cba, 2))
-        tb= 1.5
+        tb= 20.
         dicvars = {'mA': [] } 
     elif func_of_mH:
         cba = 0.01
@@ -245,14 +245,14 @@ def MakeBRPlots( plots=[] ):
         y_AtoZh = []
 
         if options.lazy:
-            input_files = {'func_of_cba': 'BR_mH-300p00_mA-200p00_2hdmtype-2_tb-1p50_function_of_cba.json', 
-                            'func_of_tb': 'BR_mH-300p00_mA-200p00_2hdmtype-2_cba-0p01_function_of_tb.json',
-                            'func_of_mA': 'BR_2hdmtype-2_tb-1p50_cba-0p01_function_of_mA.json',
+            input_files = {'func_of_cba': 'data/BR_mH-300p00_mA-200p00_2hdmtype-2_tb-1p50_function_of_cba.json', 
+                            'func_of_tb': 'data/BR_mH-300p00_mA-200p00_2hdmtype-2_cba-0p01_function_of_tb.json',
+                            'func_of_mA': 'BR_2hdmtype-2_tb-20p00_cba-0p01_function_of_mA.json',
                             'func_of_mH': 'BR_2hdmtype-2_tb-1p50_cba-0p01_function_of_mH.json'
                         }
         else:
-            input_files = {'func_of_cba': ZABR(type2hdm=options.type, func_of_cba=True, func_of_tb=False, func_of_mA=False, func_of_mH=False), 
-                            'func_of_tb': ZABR(type2hdm=options.type, func_of_cba=False, func_of_tb=True, func_of_mA=False, func_of_mH=False),
+            input_files = {# 'func_of_cba': ZABR(type2hdm=options.type, func_of_cba=True, func_of_tb=False, func_of_mA=False, func_of_mH=False), 
+                           # 'func_of_tb': ZABR(type2hdm=options.type, func_of_cba=False, func_of_tb=True, func_of_mA=False, func_of_mH=False),
                             'func_of_mA': ZABR(type2hdm=options.type, func_of_cba=False, func_of_tb=False, func_of_mA=True, func_of_mH=False),
                             'func_of_mH': ZABR(type2hdm=options.type, func_of_cba=False, func_of_tb=False, func_of_mA=False, func_of_mH=True)
                         }
@@ -372,7 +372,7 @@ def MakeBRPlots( plots=[] ):
         elif plot == "func_of_cba":
             axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H=300$ GeV, $m_A=200$ GeV, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
         elif plot == "func_of_mA":
-            axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H= m_Z + m_A$, $cos(\beta-\alpha) = 0.01$, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
+            axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_H= m_Z + m_A$, $cos(\beta-\alpha) = 0.01$, $tan\beta = 20.$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
         elif plot == "func_of_mH":
             axs[rowH,colH].text(0.02,  1.02, r"2HDM-Type{}: $m_A= m_H - m_Z$, $cos(\beta-\alpha) = 0.01$, $tan\beta = 1.5$".format('II' if options.type==2 else('I')), fontsize=18, color='black', transform=axs[rowH,colH].transAxes)
         #Second subplot
@@ -431,8 +431,9 @@ def MakeBRPlots( plots=[] ):
         axs[rowH,colH].grid()
         axs[rowA,colA].set_ylabel(r'BR($A \to XX$)', fontsize=26, horizontalalignment='right', y=1.0)
         axs[rowA,colA].grid()
-    #fig.tight_layout()
-    suffix= ('cosbeta-alpha_and_tb' if 'tb' in plot else ("MA_and_MH"))
+        #fig.tight_layout()
+        #suffix= ('cosbeta-alpha_and_tb' if 'tb' in plot else ("MA_and_MH"))
+    suffix ='new' 
     if fig:
         fig.savefig('2HDM{}_BRs_func_{}.pdf'.format('II' if options.type==2 else('I'), suffix), bbox_inches='tight', pad_inches=0)
         fig.savefig('2HDM{}_BRs_func_{}.png'.format('II' if options.type==2 else('I'), suffix), bbox_inches='tight', pad_inches=0)
@@ -444,8 +445,8 @@ def MakeBRPlots( plots=[] ):
 global options
 options = get_options()
 plots = [
-    'func_of_cba',
-    'func_of_tb'
+    #'func_of_cba',
+    #'func_of_tb'
     ]
 MakeBRPlots( plots=plots)
 if options.scan:

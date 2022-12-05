@@ -8,7 +8,7 @@ from scipy import interpolate
 from scipy.interpolate import griddata
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
 import CMSStyle
-from labellines import *
+from cp3_llbb.Calculators42HDM.labellines import *
 import numpy as np
 import shutil
 import collections
