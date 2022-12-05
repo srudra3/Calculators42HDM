@@ -1,7 +1,8 @@
 
 # 2HDMC - Two-Higgs-Doublet Model Caclulators -
 2HDMC is a general-purpose calculator for the two-Higgs doublet model. It allows parametrization of the Higgs potential in many different ways, convenient specification of generic Yukawa sectors, the evaluation of decay widths (including higher-order QCD corrections), theoretical constraints and much more.
-Version used: 2HDMC1.8.0 and Sushi1.7.0
+
+Version used: ``2HDMC1.8.0`` and ``Sushi1.7.0``.
 ## Install in a CMSSW release:
 ```bash
     # setup your env 
