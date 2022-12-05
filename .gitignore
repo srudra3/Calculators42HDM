@@ -24,3 +24,13 @@ Scan/*.out
 # tmp files #
 #############
 *.swp
+
+# 2HDMC output
+##############
+*.log
+*.out
+
+# png, pdf
+#########
+*.png
+*.pdf
