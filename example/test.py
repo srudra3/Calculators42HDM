@@ -23,7 +23,7 @@ test.setpdf('NNPDF30_lo_as_0130_nf_4')
 test.computeBR()
 
 
-#print "ZZ BR", test.HtoZZBR
+print "ZZ BR", test.HtoZZBR
 print "m12: ", test.m12
 print "H width: ", test.Hwidth 
 print "A width: ", test.Awidth 
