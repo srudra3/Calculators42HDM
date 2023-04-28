@@ -47,6 +47,7 @@ runthdmc.f:(.text+0x13d): undefined reference to `thdmc_set_param_'
 collect2: error: ld returned 1 exit status
 make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 ```
+In ``2HDMC-1.8.0/Makefile`` replace these lines:
 ```bash
   -CFLAGS= -std=c++11 -Wall $(DEBUG) $(OPT)
   +CFLAGS= -std=c++11 -Wall -fPIE $(DEBUG) $(OPT)
@@ -58,7 +59,7 @@ make[1]: *** [Makefile:197: bin/sushi.2HDMC] Error 1
 - [2HDMC](https://2hdmc.hepforge.org)
 - [SUSHI](https://sushi.hepforge.org/)
 - [LHAPDF](https://lhapdf.hepforge.org/index.html)
-- It can also be useful to download HiggsBounds/HiggsSignals (** optional** , Note: 2HDMC work without HB/HS), since 2HDMC can interface the LEP, Tevatron and LHC constraints implemented in these codes. HiggsBounds/HiggsSignals are available: 
+- It can also be useful to download HiggsBounds/HiggsSignals (Note: 2HDMC work without HB/HS), since 2HDMC can interface the LEP, Tevatron and LHC constraints implemented in these codes. HiggsBounds/HiggsSignals are available: 
 - [HiggsBounds](http://higgsbounds.hepforge.org)
 - [HiggsSignals](http://higgsbounds.hepforge.org)
 ## Useful Links:  
