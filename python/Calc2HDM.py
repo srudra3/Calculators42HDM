@@ -161,11 +161,15 @@ class Calc2HDM:
         run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiCardName + ".in", sushiCardName + ".out"]
         print( " ".join(run_sushi) )
         
+        sushi_out = 'Scan/sushilogs'
+        if not os.path.isdir(sushi_out):
+            os.makedirs(sushi_out)
+        
         # overwrite these files 
-        outputExists = False 
-        #outputExists = os.path.isfile(os.path.join('Scan/sushilogs/', sushiCardName+'.log') )
+        outputExists  = False 
+        #outputExists = os.path.isfile(os.path.join(sushi_out, sushiCardName+'.log') )
         if not outputExists:
-            logFile = os.path.join('Scan/sushilogs/', 'sushi1.7.0_'+sushiCardName+'.log')
+            logFile = os.path.join(sushi_out, 'sushi1.7.0_'+sushiCardName+'.log')
             with open(logFile, 'w+') as f:
                 p = subprocess.Popen(run_sushi, stdout=f, stderr=f, cwd=os.path.join(pwd, path_tosushi_output_cards ))
                 p.communicate()
