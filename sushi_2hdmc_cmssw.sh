@@ -2,7 +2,7 @@
 
 DIR='cp3_llbb/Calculators42HDM'
 set -x
-# In a CMSSW release
+# inside a CMSSW release
 if [[ ! -d "$DIR" ]]; then
     echo "clone ..."
     git clone -o upstream git@github.com:kjaffel/Calculators42HDM.git $DIR
@@ -10,8 +10,10 @@ fi
 scram b
 cmsenv
 
+pwd
+pushd $DIR
+
 #echo "--> Building LHAPDF"
-#pushd $DIR
 #wget https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.3.0.tar.gz -O LHAPDF-6.3.0.tar.gz
 ### ^ or use a web browser to download, which will get the filename correct
 #tar xf LHAPDF-6.3.0.tar.gz
@@ -22,7 +24,6 @@ cmsenv
 #popd
 #
 #echo "--> Building Higgs Bounds"
-#pushd $DIR
 #wget https://higgsbounds.hepforge.org/downloads?f=HiggsBounds-5.3.2beta.tar.gz -O HiggsBounds-5.3.2beta.tar.gz
 #tar -zxvf HiggsBounds-5.3.2beta.tar.gz
 #pushd HiggsBounds-5.3.2beta
@@ -39,7 +40,6 @@ cmsenv
 #popd
 #
 echo "--> Building 2HDMC"
-pushd $DIR
 wget http://www.hepforge.org/archive/2hdmc/2HDMC-1.8.0.tar.gz
 tar -zxvf 2HDMC-1.8.0.tar.gz
 pushd 2HDMC-1.8.0
@@ -72,6 +72,4 @@ make predef=2HDMC
 #make predef=FH
 popd
 
-#source first_setup.sh
-pushd ${CMSSW_BASE}
 set +x

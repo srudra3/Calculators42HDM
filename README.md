@@ -18,9 +18,6 @@ Version used: ``2HDMC1.8.0`` and ``Sushi1.7.0``.
     # Get and execute the install script
     wget https://raw.githubusercontent.com/kjaffel/Calculators42HDM/master/sushi_2hdmc_cmssw.sh 
     source sushi_2hdmc_cmssw.sh
-
-    # not mandatory:  Setup github remotes
-    source first_setup.sh
 ```
 ## Install With Conda (from [@pdavid](https://github.com/pieterdavid)):
 - [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html)
