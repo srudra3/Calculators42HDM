@@ -5,18 +5,21 @@
 Version used: ``2HDMC1.8.0`` and ``Sushi1.7.0``.
 ## Install in a CMSSW release:
 ```bash
-    # setup your env 
+    # setup your env : for cp3 ingrid-ui1 cluster 
     module load gcc/gcc-7.3.0-sl7_amd64 lhapdf/6.1.6-sl7_gcc73
+    
     # Install a CMSSW release .eg. CMSSW_10_2_22
     cmsrel CMSSW_10_2_22
+    cd CMSSW_10_2_22/src
     cmsenv
+    cd -
     git cms-init
 
     # Get and execute the install script
-    wget https://github.com/kjaffel/Calculators42HDM/master/sushi_2hdmc_cmssw.sh
+    wget https://raw.githubusercontent.com/kjaffel/Calculators42HDM/master/sushi_2hdmc_cmssw.sh 
     source sushi_2hdmc_cmssw.sh
 
-    # Setup github remotes
+    # not mandatory:  Setup github remotes
     source first_setup.sh
 ```
 ## Install With Conda (from [@pdavid](https://github.com/pieterdavid)):
