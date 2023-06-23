@@ -8,9 +8,8 @@ sqrts = 13000
 type = 2
 mh = 125
 tb = 1.
-sba = 1. # math.sqrt(1 - pow(cba, 2))
-#cba = math.sqrt(1 + pow(sba, 2))
-cba = 0
+sba = 0.99 # math.sqrt(1 - pow(cba, 2))
+cba = math.sqrt(1 + pow(sba, 2))
 mZ = 91.1876
 ZtollBR =  3.3658 * 2 / 100. # no taus
 
@@ -33,27 +32,7 @@ def float_to_str(x, digits=2):
 
 for mA, mH in [
     (1000,600),
-    (900,350),
-    (500,400),
-    (1500,1400),
-    (1500,1000),
-    (500,350),
-    (700,350),
-    (1200,850),
-    (1800,1600),
-    (500,370),
-    (700,370),
-    (900,370),
-    (700,400),
-    (900,400),
-    (1200,400),
-    (1500,400),
-    (1800,400),
-    (800,600),
-    (800,650),
-    (1000,700),
-    (1000,800),
-    (1200,1000) ]:
+ ]:
     
     mhc = max(mH, mA)
     m12 = math.sqrt(pow(mhc, 2) * tb / (1 + pow(tb, 2)))
@@ -65,11 +44,10 @@ for mA, mH in [
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
     x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
     x.computeBR()
-    xsec = x.getXsecFromSusHi()
+    xsec = x.getXsecFromSusHi()  
     xsec_ggH =  xsec["full"]['ggh'][0]
     xsec_ggH_err = xsec["full"]['ggh'][1]
-#    xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH, mb_MSscheme_muR= x.getXsecFromSusHi()
-    #print ( " xsec( gg-fusion), AtoZHBR, HtottBR ", xsec_ggH, x.AtoZHBR, x.HtottBR )
+
     
     results['mH'].append(mH)
     results['mA'].append(mA)

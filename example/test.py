@@ -2,6 +2,7 @@
 
 import math
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
+#import Calc2HDM
 
 # Alex's PhD thesis parameters
 muR4ggh = 0.5
