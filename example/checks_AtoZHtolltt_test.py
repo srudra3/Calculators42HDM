@@ -17,13 +17,14 @@ mb = 4.92 # mb(OS) pole mass
 mb__tilde__ = 4.92 # mb~
 MZ= 9.118760e+01
 
-results = {
-    'mH': [],
-    'mA': [],
-    'ggh_sigma': [],
-    'ggh_sigma_err': [],
-    'BR': []
-    }
+
+
+mH_list = []
+mA_list = []
+#'ggh_sigma': [],
+#'ggh_sigma_err': [],
+#'BR': []
+
 
 def float_to_str(x, digits=2):
     tmp = ':.{:d}f'.format(digits)
@@ -31,7 +32,7 @@ def float_to_str(x, digits=2):
     return tmp.replace('.', 'p')
 
 for mA, mH in [
-    (1000,600),
+    (2000,350),
  ]:
     
     mhc = max(mH, mA)
@@ -39,7 +40,6 @@ for mA, mH in [
     
     muR4ggh = mA/2
     muF4ggh = muR4ggh
-    print muR4ggh 
     outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}.dat".format(mA, mH)
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
     x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
@@ -47,13 +47,20 @@ for mA, mH in [
     xsec = x.getXsecFromSusHi()  
     xsec_ggH =  xsec["full"]['ggh'][0]
     xsec_ggH_err = xsec["full"]['ggh'][1]
+    print xsec["full"]['bbh'][0]
 
     
-    results['mH'].append(mH)
-    results['mA'].append(mA)
-    results['ggh_sigma'].append(xsec_ggH)
-    results['ggh_sigma_err'].append(xsec_ggH_err)
-    results['BR'].append(x.AtoZHBR * x.HtottBR * ZtollBR)
+    mH_list.append(mH)
+    mA_list.append(mA)
+#    ['ggh_sigma'].append(xsec_ggH)
+#    ['ggh_sigma_err'].append(xsec_ggH_err)
+#    ['BR'].append(x.AtoZHBR * x.HtottBR * ZtollBR)
 
-with open('AToZH_xsc_br_results.json', 'w+') as f:
-    json.dump(results, f)
+
+#    results = {
+#	(mA, mH)
+#    }
+
+
+#with open('test.json', 'w+') as f:
+#    json.dump(results, f)

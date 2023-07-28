@@ -9,7 +9,7 @@ sqrts = 13000
 type = 2
 mh = 125
 tb = 1.
-sba = 1. # math.sqrt(1 - pow(cba, 2))
+sba = 0.99995 # math.sqrt(1 - pow(cba, 2))
 #cba = math.sqrt(1 + pow(sba, 2))
 cba = 0
 mZ = 91.1876
@@ -127,6 +127,7 @@ for mA, mH in [
     (1000,650),
     (1000,700),
     (1000,750),
+    (1000,800),
     (1000,850),
     (1000,900),
     (1050,330),
@@ -142,6 +143,7 @@ for mA, mH in [
     (1050,800),
     (1050,850),
     (1050,900),
+    (1050,950),
     (1100,330),
     (1100,350),
     (1100,400),
@@ -306,11 +308,13 @@ for mA, mH in [
     (2100,2000) ]:
     
     mhc = max(mH, mA)
-    m12 = math.sqrt(pow(mhc, 2) * tb / (1 + pow(tb, 2)))
+    sinb = tb/(math.sqrt(pow(tb,2)+1))
+    cosb = 1/(math.sqrt(pow(tb,2)+1))
+    m12 = math.sqrt(pow(mH, 2)*sinb*cosb)
     
     muR4ggh = mA/2
     muF4ggh = muR4ggh
-    print muR4ggh 
+    #print muR4ggh 
     outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}.dat".format(mA, mH)
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
     x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
