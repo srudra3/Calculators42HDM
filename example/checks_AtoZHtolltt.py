@@ -13,22 +13,27 @@ sba = 0.99995 # math.sqrt(1 - pow(cba, 2))
 #cba = math.sqrt(1 + pow(sba, 2))
 cba = 0
 mZ = 91.1876
-ZtollBR =  3.3632 * 3.3662 / 100. # including taus
+ZtollBR =  (3.3632 + 3.3662)/ 100. # not including taus
 
 mb = 4.92 # mb(OS) pole mass
 mb__tilde__ = 4.92 # mb~
 MZ= 9.118760e+01
 
-results = {
-    'mH': [],
-    'mA': [],
-    'ggh_sigma': [],
-    'bbh_sigma': [],
-    'bbh_sigma_err': [],
-    'ggh_sigma_err': [],
-    'BR': [],
-    'xsecxBR': []
-    }
+#results = {
+#    'mH': [],
+#    'mA': [],
+#    'ggh_sigma': [],
+#    'bbh_sigma': [],
+#    'bbh_sigma_err': [],
+#    'ggh_sigma_err': [],
+#    'BR': [],
+#    'xsecxBR': []
+#    }
+
+results = {}
+
+
+
 
 def float_to_str(x, digits=2):
     tmp = ':.{:d}f'.format(digits)
@@ -314,7 +319,6 @@ for mA, mH in [
     
     muR4ggh = mA/2
     muF4ggh = muR4ggh
-    #print muR4ggh 
     outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}.dat".format(mA, mH)
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
     x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
@@ -326,25 +330,27 @@ for mA, mH in [
     xsec_bbH_err =  xsec["full"]['bbh'][1]
 #    xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH, mb_MSscheme_muR= x.getXsecFromSusHi()
     #print ( " xsec( gg-fusion), AtoZHBR, HtottBR ", xsec_ggH, x.AtoZHBR, x.HtottBR )
+     
+    results["{mA},{mH}".format(mA=mA,mH=mH)] = {"AtoZHBR":x.AtoZHBR, "HtottBR":x.HtottBR, "xsec_ggH":xsec_ggH}
+
+    #results['mH'].append(mH)
+    #results['mA'].append(mA)
+    #results['ggh_sigma'].append(xsec_ggH)
+    #results['bbh_sigma'].append(xsec_bbH)
+    #results['ggh_sigma_err'].append(xsec_ggH_err)
+    #results['bbh_sigma_err'].append(xsec_bbH_err)
+    #results['BR'].append(x.AtoZHBR * x.HtottBR * ZtollBR)
+    #results['xsecxBR'].append(xsec_ggH*x.AtoZHBR * x.HtottBR * ZtollBR)
     
-    results['mH'].append(mH)
-    results['mA'].append(mA)
-    results['ggh_sigma'].append(xsec_ggH)
-    results['bbh_sigma'].append(xsec_bbH)
-    results['ggh_sigma_err'].append(xsec_ggH_err)
-    results['bbh_sigma_err'].append(xsec_bbH_err)
-    results['BR'].append(x.AtoZHBR * x.HtottBR * ZtollBR)
-    results['xsecxBR'].append(xsec_ggH*x.AtoZHBR * x.HtottBR * ZtollBR)
-    
-plt.plot(results['mA'], results['ggh_sigma'], color='black', marker='o', label= 'gg-fusion from SUSHI')
-plt.plot(results['mA'], results['bbh_sigma'], color='red', marker='o', label= 'bb-associated production')
+#plt.plot(results['mA'], results['ggh_sigma'], color='black', marker='o', label= 'gg-fusion from SUSHI')
+#plt.plot(results['mA'], results['bbh_sigma'], color='red', marker='o', label= 'bb-associated production')
 
 #plt.ylabel(r'$\sigma$ ($pp \rightarrow A$) $\times$ BR($A \rightarrow ZH \rightarrow lltt$)')
-plt.ylabel(r'$\sigma$ ($pp \rightarrow A$)')
-plt.xlabel(r'm_A$ [GeV]')
-plt.title(r'$2HDM-typeII:  M_{H^-+}=M_{A}, tan\beta= 1, cos(\beta-\alpha)= 0, mh= 125. GeV$', fontsize=10.)
-plt.yscale('log')
-plt.legend()
-plt.savefig('pptoAxsec.png')
+#plt.ylabel(r'$\sigma$ ($pp \rightarrow A$)')
+#plt.xlabel(r'm_A$ [GeV]')
+#plt.title(r'$2HDM-typeII:  M_{H^-+}=M_{A}, tan\beta= 1, cos(\beta-\alpha)= 0, mh= 125. GeV$', fontsize=10.)
+#plt.yscale('log')
+#plt.legend()
+#plt.savefig('pptoAxsec.png')
 with open('AToZH_xsc_br_results.json', 'w+') as f:
     json.dump(results, f)
