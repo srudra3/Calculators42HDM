@@ -3,6 +3,8 @@ import math
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
 import json
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 mode = 'A' # means A-> ZH  or 'H' means H ->ZA
 sqrts = 13000
@@ -317,7 +319,8 @@ for mA, mH in [
     cosb = 1/(math.sqrt(pow(tb,2)+1))
     m12 = math.sqrt(pow(mH, 2)*sinb*cosb)
     
-    muR4ggh = mA/2
+    #muR4ggh = mA/2
+    muR4ggh = 0.5 
     muF4ggh = muR4ggh
     outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}.dat".format(mA, mH)
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
