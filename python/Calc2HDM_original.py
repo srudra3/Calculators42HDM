@@ -122,10 +122,10 @@ class Calc2HDM:
         
         sushiCardName = 'mH_{}_mA_{}_tb_{}_cba_{}_mode_{}'.format(float_to_str(self.mH), float_to_str(self.mA), float_to_str(self.tb), float_to_str(self.sba), str(self.mode)) 
         sushiDefaultCardPath = "default_cards/default_sushi.in"
-        sushiInputCardPath   =  sushiCardName + ".in"
-        sushiOutputCardPath  =  sushiCardName + ".out"
+        sushiInputCardPath   = "Scan/" + str(self.pdf) +'/' + sushiCardName + ".in"
+        sushiOutputCardPath  = "Scan/" + str(self.pdf) +'/' + sushiCardName + ".out"
         
-        path_tosushi_output_cards="."
+        path_tosushi_output_cards="Scan/"+ str(self.pdf)
         if not os.path.exists(path_tosushi_output_cards):
             os.makedirs(path_tosushi_output_cards)
         # Replacements of variables into the input file
@@ -158,10 +158,10 @@ class Calc2HDM:
      
         #running SusHi
         pwd = os.getcwd()
-        run_sushi = ["SusHi-1.7.0/bin/sushi", sushiCardName + ".in", sushiCardName + ".out"]
+        run_sushi = ["../../SusHi-1.7.0/bin/sushi", sushiCardName + ".in", sushiCardName + ".out"]
         print( " ".join(run_sushi) )
         
-        sushi_out = 'sushilogs'
+        sushi_out = 'Scan/sushilogs'
         if not os.path.isdir(sushi_out):
             os.makedirs(sushi_out)
         

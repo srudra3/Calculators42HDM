@@ -1,14 +1,36 @@
 #!/bin/env python
+import os
+import subprocess
 import math
 from cp3_llbb.Calculators42HDM.Calc2HDM import *
 import json
 import matplotlib.pyplot as plt
 import numpy as np
 mode = 'A' # means A-> ZH  or 'H' means H ->ZA
+def source_env(script_path):
+    command = ['bash', '-c', 'source {} && env'.format(script_path)]
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+    for line in proc.stdout:
+        key, _, value = line.partition("=")
+        os.environ[key] = value.strip()
+    proc.communicate()
+
+# Path to your env.sh script
+env_script_path = "/afs/cern.ch/work/s/srudrabh/AZH/TheoryComputations/CMSSW_10_2_22/src/cp3_llbb/Calculators42HDM/env.sh"
+source_env(env_script_path)
+print("LD_LIBRARY_PATH:", os.environ.get('LD_LIBRARY_PATH'))
+
+#gsl_lib_path = "gsl-2.8/.libs"
+#print("Checking for GSL libraries in:", gsl_lib_path)
+#if os.path.exists(gsl_lib_path):
+#    print("Contents:", os.listdir(gsl_lib_path))
+#else:
+#    print("GSL library path does not exist:", gsl_lib_path)
+
 sqrts = 13000
 type = 2
 mh = 125
-tb = 1.5 
+tb = 3.0 
 sba = 0.99995 # math.sqrt(1 - pow(cba, 2))
 #cba = math.sqrt(1 + pow(sba, 2))
 cba = 0
@@ -319,17 +341,15 @@ for mA, mH in [
     
     muR4ggh = 0.5 
     muF4ggh = muR4ggh
-    outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}.dat".format(mA, mH)
+    outputFile = "2hdmc_results/2hdmc1.8.0_mA-{}_mH-{}_tb-{}.dat".format(mA, mH, tb)
     x = Calc2HDM(mode = mode, sqrts = sqrts, type = type, tb = tb, m12 = m12, mh = mh, mH = mH, mA = mA, mhc = mhc, sba = sba, outputFile = outputFile, muR4ggh = muR4ggh, muF4ggh = muF4ggh)
     x.setpdf('NNPDF31_nnlo_as_0118_nf_4_mc_hessian')
     x.computeBR()
-    print("Warning: {} not created!".format(outputFile))
-
     xsec = x.getXsecFromSusHi()
     xsec_ggH =  xsec["full"]['ggh'][0]
     xsec_ggH_err = xsec["full"]['ggh'][1]
-    xsec_bbH =  xsec["full"]['bbh'][0]
-    xsec_bbH_err =  xsec["full"]['bbh'][1]
+#    xsec_bbH =  xsec["full"]['bbh'][0]
+#    xsec_bbH_err =  xsec["full"]['bbh'][1]
 #    xsec_ggH, err_integration_ggH, err_muRm_ggH, err_muRp_ggH, xsec_bbH, err_integration_bbH, mb_MSscheme_muR= x.getXsecFromSusHi()
     #print ( " xsec( gg-fusion), AtoZHBR, HtottBR ", xsec_ggH, x.AtoZHBR, x.HtottBR )
     
@@ -355,7 +375,7 @@ for mA, mH in [
 #plt.yscale('log')
 #plt.legend()
 #plt.savefig('pptoAxsec.png')
-with open('total_xsec_results_tanb1.json', 'w+') as f:
+with open('total_xsec_results_tanb3_singularity.json', 'w+') as f:
     json.dump(total_results, f)
-with open('AToZH_xsc_br_results_tanb1.json', 'w+') as f:
+with open('AToZH_xsc_br_results_tanb3_singularity.json', 'w+') as f:
     json.dump(results, f)
